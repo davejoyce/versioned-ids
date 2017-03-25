@@ -1,5 +1,5 @@
 /*
- *  Copyright 2016 $user
+ *  Copyright 2016 David Joyce
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 package io.github.davejoyce.id;
 
 import java.lang.reflect.Constructor;
+import java.time.Instant;
+import java.util.Arrays;
 
 /**
- * Subclass of {@link NamespaceId} that holds a high-precision
- * creation timestamp. Instances of this class are
- * {@link Comparable} and provide 'natural' sort order. Additionally, a
- * {@code NamespaceId} object produces a text representation of itself from
- * which it can later be reconstructed.
+ * Subclass of {@link NamespaceId} that holds a high-precision creation
+ * timestamp. Instances of this class are {@link Comparable} and provide
+ * 'natural' sort order. Additionally, a {@code NamespaceId} object produces a
+ * text representation of itself from which it can later be reconstructed.
  *
  * @param <T> comparable type of ID value
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
@@ -33,9 +34,12 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
     public static <T extends Comparable<T>> TemporalNamespaceId<T> fromString(String idString, Class<T> idType) {
         int separatorPos1 = idString.indexOf(SEPARATOR);
         int separatorPos2 = idString.lastIndexOf(SEPARATOR);
+        if (-1 == separatorPos1 || separatorPos2 == separatorPos1) {
+            throw new IllegalArgumentException("ID string must contain at least 2 '" + SEPARATOR + "' separators");
+        }
         String namespace = idString.substring(0, separatorPos1);
         String idVal = idString.substring((separatorPos1 + 1), separatorPos2);
-        String asOfTimeVal = idString.substring((separatorPos2 + 1));
+        String asOfTimeVal = idString.substring((separatorPos2 + 1), idString.length());
         T id = null;
         try {
             Constructor<T> constructor = idType.getConstructor(String.class);
@@ -43,22 +47,24 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
         } catch (Exception e) {
             id = idType.cast(idVal);
         }
-        return new TemporalNamespaceId<T>(namespace, id, Double.parseDouble(asOfTimeVal));
+        Instant asOfTime = Instant.parse(asOfTimeVal);
+        long[] asOfTimeParts = new long[] { asOfTime.getEpochSecond(), asOfTime.getNano() };
+        return new TemporalNamespaceId<T>(namespace, id, asOfTimeParts);
     }
 
     public static TemporalNamespaceId<String> fromString(String idString) {
         return fromString(idString, String.class);
     }
 
-    private final double asOfTime;
+    private final long[] asOfTime;
 
-    protected TemporalNamespaceId(String namespace, T id, double asOfTime) {
+    protected TemporalNamespaceId(String namespace, T id, long[] asOfTime) {
         super(namespace, id);
         this.asOfTime = asOfTime;
     }
 
-    public double getAsOfTime() {
-        return asOfTime;
+    public Instant getAsOfTime() {
+        return Instant.ofEpochSecond(asOfTime[0], asOfTime[1]);
     }
 
     @Override
@@ -67,14 +73,14 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         TemporalNamespaceId<?> that = (TemporalNamespaceId<?>) o;
-        return Double.compare(that.asOfTime, asOfTime) == 0;
+        return ((this.asOfTime[0] == that.asOfTime[0]) &&
+                (this.asOfTime[1] == that.asOfTime[1]));
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        long temp = Double.doubleToLongBits(asOfTime);
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + Arrays.hashCode(asOfTime);
         return result;
     }
 
@@ -83,12 +89,14 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
         int comp = super.compareTo(o);
         if (0 != comp) return comp;
         TemporalNamespaceId<T> that = (TemporalNamespaceId<T>)o;
-        return Double.compare(this.asOfTime, that.asOfTime);
+        comp = Long.valueOf(this.asOfTime[0]).compareTo(that.asOfTime[0]);
+        if (0 != comp) return comp;
+        return Long.valueOf(this.asOfTime[1]).compareTo(that.asOfTime[1]);
     }
 
     @Override
     public String toString() {
-        return new StringBuilder(super.toString()).append(SEPARATOR).append(asOfTime).toString();
+        return super.toString() + SEPARATOR + getAsOfTime().toString();
     }
 
 }

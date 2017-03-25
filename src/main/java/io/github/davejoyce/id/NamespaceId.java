@@ -17,7 +17,9 @@
 package io.github.davejoyce.id;
 
 import java.lang.reflect.Constructor;
-import java.util.Objects;
+
+import static io.github.davejoyce.util.Arguments.requireNonEmpty;
+import static io.github.davejoyce.util.Arguments.requireNonNull;
 
 /**
  * Unique identifier within a particular namespace. Instances of this class are
@@ -25,17 +27,34 @@ import java.util.Objects;
  * {@code NamespaceId} object produces a text representation of itself from
  * which it can later be reconstructed.
  *
- * @param <T> comparable type of ID value
+ * @param <T> comparable type of ID attribute
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
 public class NamespaceId<T extends Comparable<T>> implements Comparable<NamespaceId<T>> {
 
     public static final char SEPARATOR = '/';
 
+    /**
+     * Create a new {@code NamespaceId} instance with ID attribute of type
+     * <tt>T</tt> from the specified string representation.
+     *
+     * @param idString '/' separated ID string to be parsed
+     * @param idType class of ID attribute type
+     * @param <T> comparable type of ID attribute
+     * @return new NamespaceId object
+     */
     public static <T extends Comparable<T>> NamespaceId<T> fromString(String idString, Class<T> idType) {
-        int separatorPos = idString.indexOf(SEPARATOR);
-        String namespace = idString.substring(0, separatorPos);
-        String idVal = idString.substring((separatorPos + 1), idString.length());
+        int firstSeparatorPos = idString.indexOf(SEPARATOR);
+        if (-1 == firstSeparatorPos) {
+            throw new IllegalArgumentException("ID string must contain at least 1 '" + SEPARATOR + "' separator");
+        }
+        // ID string may be temporal or bi-temporal ID string being downcast;
+        // disregard temporal components past 2nd slash
+        int lastSeparatorPos = idString.lastIndexOf(SEPARATOR);
+        int endPos = (lastSeparatorPos == firstSeparatorPos) ? idString.length() : lastSeparatorPos;
+
+        String namespace = idString.substring(0, firstSeparatorPos);
+        String idVal = idString.substring((firstSeparatorPos + 1), endPos);
         T id = null;
         try {
             Constructor<T> constructor = idType.getConstructor(String.class);
@@ -46,6 +65,13 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
         return new NamespaceId<T>(namespace, id);
     }
 
+    /**
+     * Create a new {@code NamespaceId} instance with ID attribute of type
+     * <tt>String</tt> from the specified string representation.
+     *
+     * @param idString '/' separated ID string to be parsed
+     * @return new NamespaceId object
+     */
     public static NamespaceId<String> fromString(String idString) {
         return fromString(idString, String.class);
     }
@@ -54,8 +80,8 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
     private final T id;
 
     protected NamespaceId(String namespace, T id) {
-        this.namespace = Objects.requireNonNull(namespace, "Namespace argument cannot be null");
-        this.id = Objects.requireNonNull(id, "ID argument cannot be null");
+        this.namespace = requireNonEmpty(namespace, "Namespace argument cannot be empty");
+        this.id = requireNonNull(id, "ID argument cannot be null");
     }
 
     public String getNamespace() {

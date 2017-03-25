@@ -21,10 +21,12 @@ package io.github.davejoyce.util;
  *
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
-public class Arguments {
+public final class Arguments {
 
     public static final String ERROR_NULL_ARG = "Argument cannot be null";
     public static final String ERROR_EMPTY_STRING = "String argument cannot be empty";
+
+    private Arguments() {}
 
     public static <T> T requireNonNull(T argument, String errMsg) {
         if (null == argument) {

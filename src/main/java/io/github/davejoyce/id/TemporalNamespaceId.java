@@ -40,17 +40,11 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
         if (-1 == separatorPos1 || separatorPos2 == separatorPos1) {
             throw new IllegalArgumentException("ID string must contain at least 2 '" + SEPARATOR + "' separators");
         }
-        String namespace = idString.substring(0, separatorPos1);
+        final String namespace = idString.substring(0, separatorPos1);
         String idVal = idString.substring((separatorPos1 + 1), separatorPos2);
         String asOfTimeVal = idString.substring((separatorPos2 + 1), idString.length());
-        T id = null;
-        try {
-            Constructor<T> constructor = idType.getConstructor(String.class);
-            id = constructor.newInstance(idVal);
-        } catch (Exception e) {
-            id = idType.cast(idVal);
-        }
-        Instant asOfTime = Instant.parse(asOfTimeVal);
+        final T id = convertId(idVal, idType);
+        final Instant asOfTime = Instant.parse(asOfTimeVal);
         return new TemporalNamespaceId<T>(namespace, id, asOfTime);
     }
 

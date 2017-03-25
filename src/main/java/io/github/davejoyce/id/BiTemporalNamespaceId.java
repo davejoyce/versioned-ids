@@ -41,19 +41,13 @@ public class BiTemporalNamespaceId<T extends Comparable<T>> extends TemporalName
         if (-1 == separatorPos1 || -1 == separatorPos2 || separatorPos3 == separatorPos2) {
             throw new IllegalArgumentException("ID string must contain at least 3 '" + SEPARATOR + "' separators");
         }
-        String namespace = idString.substring(0, separatorPos1);
+        final String namespace = idString.substring(0, separatorPos1);
         String idVal = idString.substring((separatorPos1 + 1), separatorPos2);
         String asOfTimeVal = idString.substring((separatorPos2 + 1), separatorPos3);
         String asAtTimeVal = idString.substring((separatorPos3 + 1), idString.length());
-        T id = null;
-        try {
-            Constructor<T> constructor = idType.getConstructor(String.class);
-            id = constructor.newInstance(idVal);
-        } catch (Exception e) {
-            id = idType.cast(idVal);
-        }
-        Instant asOfTime = Instant.parse(asOfTimeVal);
-        Instant asAtTime = Instant.parse(asAtTimeVal);
+        final T id = convertId(idVal, idType);
+        final Instant asOfTime = Instant.parse(asOfTimeVal);
+        final Instant asAtTime = Instant.parse(asAtTimeVal);
         return new BiTemporalNamespaceId<>(namespace, id, asOfTime, asAtTime);
     }
 

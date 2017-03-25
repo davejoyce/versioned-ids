@@ -59,32 +59,9 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
         int lastSeparatorPos = rawIdString.lastIndexOf(SEPARATOR);
         int endPos = (lastSeparatorPos == firstSeparatorPos) ? rawIdString.length() : lastSeparatorPos;
 
-        String namespace = requireNonEmpty(rawIdString.substring(0, firstSeparatorPos), "Namespace segment cannot be empty");
+        final String namespace = requireNonEmpty(rawIdString.substring(0, firstSeparatorPos), "Namespace segment cannot be empty");
         String idVal = requireNonEmpty(rawIdString.substring((firstSeparatorPos + 1), endPos), "Identifier segment cannot be empty");
-        T id = null;
-        try {
-            // 1. Look for standard 'valueOf' factory method on type
-            Method valueOfMethod = idType.getMethod("valueOf", String.class);
-            id = idType.cast(valueOfMethod.invoke(null, idVal));
-        } catch (IllegalAccessException |
-                 InvocationTargetException |
-                 NoSuchMethodException e1) {
-            try {
-                // 2. Look for constructor that takes a string representation of value
-                Constructor<T> constructor = idType.getConstructor(String.class);
-                id = constructor.newInstance(idVal);
-            } catch (IllegalAccessException |
-                     InstantiationException |
-                     InvocationTargetException |
-                     NoSuchMethodException e2) {
-                try {
-                    // 3. See if we can just cast it to the target type (last resort)
-                    id = idType.cast(idVal);
-                } catch (ClassCastException cce) {
-                    throw new IllegalArgumentException("Identifier segment cannot be converted to type: " + idType.getCanonicalName());
-                }
-            }
-        }
+        final T id = convertId(idVal, idType);
         return new NamespaceId<>(namespace, id);
     }
 
@@ -100,6 +77,44 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
      */
     public static NamespaceId<String> fromString(String idString) {
         return fromString(idString, String.class);
+    }
+
+    /**
+     * Convert the specified string representation of the ID value to its actual
+     * type. This utility method is protected for use within {@code NamespaceId}
+     * and subclasses only.
+     *
+     * @param idValue string to be converted
+     * @param idType class of ID attribute type
+     * @param <T> comparable type of ID attribute
+     * @return converted ID attribute
+     */
+    protected static <T extends Comparable<T>> T convertId(String idValue, Class<T> idType) {
+        final T id;
+        try {
+            // 1. Look for standard 'valueOf' factory method on type
+            Method valueOfMethod = idType.getMethod("valueOf", String.class);
+            id = idType.cast(valueOfMethod.invoke(null, idValue));
+        } catch (IllegalAccessException |
+                InvocationTargetException |
+                NoSuchMethodException e1) {
+            try {
+                // 2. Look for constructor that takes a string representation of value
+                Constructor<T> constructor = idType.getConstructor(String.class);
+                id = constructor.newInstance(idValue);
+            } catch (IllegalAccessException |
+                    InstantiationException |
+                    InvocationTargetException |
+                    NoSuchMethodException e2) {
+                try {
+                    // 3. See if we can just cast it to the target type (last resort)
+                    id = idType.cast(idValue);
+                } catch (ClassCastException cce) {
+                    throw new IllegalArgumentException("Identifier segment cannot be converted to type: " + idType.getCanonicalName());
+                }
+            }
+        }
+        return id;
     }
 
     private final String namespace;

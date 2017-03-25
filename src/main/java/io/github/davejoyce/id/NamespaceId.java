@@ -62,7 +62,7 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
         } catch (Exception e) {
             id = idType.cast(idVal);
         }
-        return new NamespaceId<T>(namespace, id);
+        return new NamespaceId<>(namespace, id);
     }
 
     /**
@@ -79,15 +79,34 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
     private final String namespace;
     private final T id;
 
-    protected NamespaceId(String namespace, T id) {
+    /**
+     * Construct a {@code NamespaceId} object in the given namespace and with
+     * the given unique identifier value.
+     *
+     * @param namespace namespace to be occupied
+     * @param id unique identifier value
+     * @throws IllegalArgumentException if <tt>namespace</tt> is empty or
+     *                                  <tt>id</tt> is null
+     */
+    public NamespaceId(String namespace, T id) {
         this.namespace = requireNonEmpty(namespace, "Namespace argument cannot be empty");
         this.id = requireNonNull(id, "ID argument cannot be null");
     }
 
+    /**
+     * Get the namespace occupied by this object.
+     *
+     * @return namespace (never null)
+     */
     public String getNamespace() {
         return namespace;
     }
 
+    /**
+     * Get the unique identifier value of this object.
+     *
+     * @return ID (never null)
+     */
     public T getId() {
         return id;
     }
@@ -119,7 +138,7 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
 
     @Override
     public String toString() {
-        return new StringBuilder(namespace).append(SEPARATOR).append(id.toString()).toString();
+        return namespace + SEPARATOR + id.toString();
     }
 
 }

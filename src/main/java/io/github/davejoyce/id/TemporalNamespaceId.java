@@ -20,11 +20,14 @@ import java.lang.reflect.Constructor;
 import java.time.Instant;
 import java.util.Arrays;
 
+import static io.github.davejoyce.util.Arguments.requireNonNull;
+
 /**
  * Subclass of {@link NamespaceId} that holds a high-precision creation
  * timestamp. Instances of this class are {@link Comparable} and provide
- * 'natural' sort order. Additionally, a {@code NamespaceId} object produces a
- * text representation of itself from which it can later be reconstructed.
+ * 'natural' sort order. Additionally, a {@code TemporalNamespaceId} object
+ * produces a text representation of itself from which it can later be
+ * reconstructed.
  *
  * @param <T> comparable type of ID value
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
@@ -48,8 +51,7 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
             id = idType.cast(idVal);
         }
         Instant asOfTime = Instant.parse(asOfTimeVal);
-        long[] asOfTimeParts = new long[] { asOfTime.getEpochSecond(), asOfTime.getNano() };
-        return new TemporalNamespaceId<T>(namespace, id, asOfTimeParts);
+        return new TemporalNamespaceId<T>(namespace, id, asOfTime);
     }
 
     public static TemporalNamespaceId<String> fromString(String idString) {
@@ -58,9 +60,21 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
 
     private final long[] asOfTime;
 
-    protected TemporalNamespaceId(String namespace, T id, long[] asOfTime) {
+    public TemporalNamespaceId(String namespace, T id, long asOfTimeSeconds, int asOfTimeNanoseconds) {
         super(namespace, id);
-        this.asOfTime = asOfTime;
+        this.asOfTime = new long[] { asOfTimeSeconds, asOfTimeNanoseconds };
+    }
+
+    public TemporalNamespaceId(String namespace, T id, long asOfTimeSeconds) {
+        this(namespace, id, asOfTimeSeconds, 0);
+    }
+
+    public TemporalNamespaceId(String namespace, T id, Instant asOfTime) {
+        this(namespace, id, requireNonNull(asOfTime).getEpochSecond(), requireNonNull(asOfTime).getNano());
+    }
+
+    public TemporalNamespaceId(String namespace, T id) {
+        this(namespace, id, Instant.now());
     }
 
     public Instant getAsOfTime() {
@@ -73,8 +87,7 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         TemporalNamespaceId<?> that = (TemporalNamespaceId<?>) o;
-        return ((this.asOfTime[0] == that.asOfTime[0]) &&
-                (this.asOfTime[1] == that.asOfTime[1]));
+        return Arrays.equals(this.asOfTime, that.asOfTime);
     }
 
     @Override

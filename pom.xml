@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <name>Versioned IDs</name>
-    <description>Testbed for namespaced ID and versioned objects</description>
+    <description>Namespaced and versioned ID objects</description>
     <inceptionYear>2016</inceptionYear>
 
     <licenses>
@@ -26,7 +26,7 @@
         <project.reporting.outputVersion>UTF-8</project.reporting.outputVersion>
 
         <!-- Dependency versions -->
-        <testng.version>6.9.13.6</testng.version>
+        <testng.version>6.11</testng.version>
 
         <!-- Plugin versions -->
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>

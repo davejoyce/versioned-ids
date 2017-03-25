@@ -17,6 +17,8 @@
 package io.github.davejoyce.id;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 import static io.github.davejoyce.util.Arguments.requireNonEmpty;
 import static io.github.davejoyce.util.Arguments.requireNonNull;
@@ -42,25 +44,46 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
      * @param idType class of ID attribute type
      * @param <T> comparable type of ID attribute
      * @return new NamespaceId object
+     * @throws IllegalArgumentException if <tt>idString</tt> cannot be converted
+     *                                  back to NamespaceId with ID attribute of
+     *                                  type <tt>T</tt>
      */
     public static <T extends Comparable<T>> NamespaceId<T> fromString(String idString, Class<T> idType) {
-        int firstSeparatorPos = idString.indexOf(SEPARATOR);
+        String rawIdString = requireNonEmpty(idString, "NamespaceId string cannot be empty");
+        int firstSeparatorPos = rawIdString.indexOf(SEPARATOR);
         if (-1 == firstSeparatorPos) {
-            throw new IllegalArgumentException("ID string must contain at least 1 '" + SEPARATOR + "' separator");
+            throw new IllegalArgumentException("NamespaceId string must contain at least 1 '" + SEPARATOR + "' separator");
         }
         // ID string may be temporal or bi-temporal ID string being downcast;
         // disregard temporal components past 2nd slash
-        int lastSeparatorPos = idString.lastIndexOf(SEPARATOR);
-        int endPos = (lastSeparatorPos == firstSeparatorPos) ? idString.length() : lastSeparatorPos;
+        int lastSeparatorPos = rawIdString.lastIndexOf(SEPARATOR);
+        int endPos = (lastSeparatorPos == firstSeparatorPos) ? rawIdString.length() : lastSeparatorPos;
 
-        String namespace = idString.substring(0, firstSeparatorPos);
-        String idVal = idString.substring((firstSeparatorPos + 1), endPos);
+        String namespace = requireNonEmpty(rawIdString.substring(0, firstSeparatorPos), "Namespace segment cannot be empty");
+        String idVal = requireNonEmpty(rawIdString.substring((firstSeparatorPos + 1), endPos), "Identifier segment cannot be empty");
         T id = null;
         try {
-            Constructor<T> constructor = idType.getConstructor(String.class);
-            id = constructor.newInstance(idVal);
-        } catch (Exception e) {
-            id = idType.cast(idVal);
+            // 1. Look for standard 'valueOf' factory method on type
+            Method valueOfMethod = idType.getMethod("valueOf", String.class);
+            id = idType.cast(valueOfMethod.invoke(null, idVal));
+        } catch (IllegalAccessException |
+                 InvocationTargetException |
+                 NoSuchMethodException e1) {
+            try {
+                // 2. Look for constructor that takes a string representation of value
+                Constructor<T> constructor = idType.getConstructor(String.class);
+                id = constructor.newInstance(idVal);
+            } catch (IllegalAccessException |
+                     InstantiationException |
+                     InvocationTargetException |
+                     NoSuchMethodException e2) {
+                try {
+                    // 3. See if we can just cast it to the target type (last resort)
+                    id = idType.cast(idVal);
+                } catch (ClassCastException cce) {
+                    throw new IllegalArgumentException("Identifier segment cannot be converted to type: " + idType.getCanonicalName());
+                }
+            }
         }
         return new NamespaceId<>(namespace, id);
     }
@@ -71,6 +94,9 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
      *
      * @param idString '/' separated ID string to be parsed
      * @return new NamespaceId object
+     * @throws IllegalArgumentException if <tt>idString</tt> cannot be converted
+     *                                  back to NamespaceId with ID attribute of
+     *                                  type <tt>String</tt>
      */
     public static NamespaceId<String> fromString(String idString) {
         return fromString(idString, String.class);

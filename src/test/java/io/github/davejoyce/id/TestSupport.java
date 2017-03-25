@@ -73,6 +73,15 @@ public final class TestSupport {
     private TestSupport() {}
 
     @DataProvider
+    public static Iterator<Object[]> goodGetterDataIterator(Method m) {
+        return goodGetterDataStream(m).iterator();
+    }
+
+    private static Stream<Object[]> goodGetterDataStream(Method m) {
+        return GOOD_NSID_TYPED_OBJS.stream().map(nsId -> new Object[]{ nsId });
+    }
+
+    @DataProvider
     public static Iterator<Object[]> goodDataIterator(Method m) {
         return goodDataStream(m.getName().contains("WithType")).iterator();
     }
@@ -107,19 +116,26 @@ public final class TestSupport {
 
     @DataProvider
     public static Object[][] equalityDataArray(Method m) {
+        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
         return new Object[][] {
             new Object[] { new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 1), true },
             new Object[] { new NamespaceId<Float>("namespace", 3.141592F), new NamespaceId<Float>("namespace", 3.141592F), true },
             new Object[] { new NamespaceId<String>("namespace", "id"), new NamespaceId<String>("namespace", "ID"), false },
+            new Object[] { new NamespaceId<Integer>("namespace", 1), null, false },
+            new Object[] { nsId, nsId, true },
         };
     }
 
     @DataProvider
     public static Object[][] compareToDataArray(Method m) {
+        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
         return new Object[][] {
             new Object[] { new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 2), BEFORE },
+            new Object[] { new NamespaceId<Integer>("apples", 1), new NamespaceId<Integer>("bananas", 1), BEFORE },
             new Object[] { new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 1), AFTER },
+            new Object[] { new NamespaceId<Integer>("bananas", 1), new NamespaceId<Integer>("apples", 1), AFTER },
             new Object[] { new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 2), EQUAL },
+            new Object[] { nsId, nsId, EQUAL },
         };
     }
 

@@ -20,6 +20,9 @@ import org.testng.annotations.DataProvider;
 
 import java.lang.reflect.Method;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -38,27 +41,44 @@ public final class TestSupport {
     private static final List<String> GOOD_NSID_STRINGS = new ArrayList<>();
     private static final List<NamespaceId<String>> GOOD_NSID_STRING_OBJS = new ArrayList<>();
     private static final List<NamespaceId<?>> GOOD_NSID_TYPED_OBJS = new ArrayList<>();
+    private static final List<String> GOOD_TNSID_STRINGS = new ArrayList<>();
+    private static final List<TemporalNamespaceId<String>> GOOD_TNSID_STRING_OBJS = new ArrayList<>();
+    private static final List<TemporalNamespaceId<?>> GOOD_TNSID_TYPED_OBJS = new ArrayList<>();
     private static final List<Class<? extends Comparable<?>>> GOOD_ID_TYPES = new ArrayList<>();
 
     private static final List<String> BAD_NSID_STRINGS = new ArrayList<>();
+    private static final List<String> BAD_TNSID_STRINGS = new ArrayList<>();
     private static final List<Class<? extends Comparable<?>>> BAD_ID_TYPES = new ArrayList<>();
 
     static {
+        // Instants of specific times
+        Instant asOfTime = Instant.parse("1977-11-13T14:18:00Z");
+        Instant asAtTime = Instant.parse("2008-01-05T22:00:00Z");
+
         GOOD_NSID_STRINGS.add("namespace/id");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "id"));
         GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", "id"));
+        GOOD_TNSID_STRINGS.add("temporal/id/1977-11-13T14:18:00Z");
+        GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
         GOOD_ID_TYPES.add(String.class);
         BAD_ID_TYPES.add(Integer.class);
 
         GOOD_NSID_STRINGS.add("namespace/2");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "2"));
         GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", 2));
+        GOOD_TNSID_STRINGS.add("temporal/2/1977-11-13T14:18:00Z");
+        GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "2", asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 2, asOfTime));
         GOOD_ID_TYPES.add(Integer.class);
         BAD_ID_TYPES.add(Date.class);
 
         GOOD_NSID_STRINGS.add("namespace/3.141592");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "3.141592"));
         GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", 3.141592F));
+        GOOD_TNSID_STRINGS.add("temporal/3.141592/1977-11-13T14:18:00Z");
+        GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "3.141592", asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 3.141592F, asOfTime));
         GOOD_ID_TYPES.add(Float.class);
         BAD_ID_TYPES.add(Integer.class);
 
@@ -66,6 +86,10 @@ public final class TestSupport {
         BAD_NSID_STRINGS.add("");
         BAD_NSID_STRINGS.add("/noNamespace");
         BAD_NSID_STRINGS.add("noId/");
+        BAD_TNSID_STRINGS.add(null);
+        BAD_TNSID_STRINGS.add("");
+        BAD_TNSID_STRINGS.add("temporal/2");
+        BAD_TNSID_STRINGS.add("temporal/2/1977-11-13");
     }
 
     private TestSupport() {}
@@ -81,35 +105,73 @@ public final class TestSupport {
 
     @DataProvider
     public static Iterator<Object[]> goodDataIterator(Method m) {
-        return goodDataStream(m.getName().contains("WithType")).iterator();
+        return goodDataStream(m).iterator();
     }
 
-    private static Stream<Object[]> goodDataStream(boolean withType) {
-        int count = GOOD_NSID_STRINGS.size();
-        return (withType)
-                ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_NSID_TYPED_OBJS.get(i) })
-                : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_NSID_STRING_OBJS.get(i) });
+    private static Stream<Object[]> goodDataStream(Method m) {
+        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
+        boolean withType = m.getName().contains("WithType");
+        if (methodParamTypes.contains(NamespaceId.class)) {
+            int count = GOOD_NSID_STRINGS.size();
+            return (withType)
+                    ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_NSID_TYPED_OBJS.get(i) })
+                    : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_NSID_STRING_OBJS.get(i) });
+        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
+            int count = GOOD_TNSID_STRINGS.size();
+            return (withType)
+                    ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_TNSID_TYPED_OBJS.get(i) })
+                    : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_TNSID_STRING_OBJS.get(i) });
+        } else {
+            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
+        }
     }
 
     @DataProvider
     public static Iterator<Object[]> badDataIterator(Method m) {
-        return badDataStream(m.getName().contains("WithType")).iterator();
+        return badDataStream(m).iterator();
     }
 
-    private static Stream<Object[]> badDataStream(boolean withType) {
-        return (withType)
-                ? IntStream.range(0, GOOD_NSID_STRINGS.size()).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), BAD_ID_TYPES.get(i) })
-                : BAD_NSID_STRINGS.stream().map(bad_nsid_string -> new Object[]{bad_nsid_string});
+    private static Stream<Object[]> badDataStream(Method m) {
+        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
+        // Determine from the test class
+        Class<?> testClass = m.getDeclaringClass();
+        if (1 == methodParamTypes.size() && methodParamTypes.contains(String.class)) {
+            if (NamespaceIdTest.class.equals(testClass)) {
+                return BAD_NSID_STRINGS.stream().map(bad_nsid_string -> new Object[]{bad_nsid_string});
+            } else if (TemporalNamespaceIdTest.class.equals(testClass)) {
+                return BAD_TNSID_STRINGS.stream().map(bad_tnsid_string -> new Object[]{bad_tnsid_string});
+            } else {
+                throw new IllegalArgumentException("Unsupported test class: " + testClass.getCanonicalName());
+            }
+        } else if (2 == methodParamTypes.size()) {
+            if (NamespaceIdTest.class.equals(testClass)) {
+                return IntStream.range(0, GOOD_NSID_STRINGS.size()).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), BAD_ID_TYPES.get(i) });
+            } else if (TemporalNamespaceIdTest.class.equals(testClass)) {
+                return IntStream.range(0, GOOD_TNSID_STRINGS.size()).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), BAD_ID_TYPES.get(i) });
+            } else {
+                throw new IllegalArgumentException("Unsupported test class: " + testClass.getCanonicalName());
+            }
+        } else {
+            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
+        }
     }
 
     @DataProvider
     public static Iterator<Object[]> goodToStringDataIterator(Method m) {
-        return goodToStringDataStream().iterator();
+        return goodToStringDataStream(m).iterator();
     }
 
-    private static Stream<Object[]> goodToStringDataStream() {
-        int count = GOOD_NSID_STRING_OBJS.size();
-        return IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRING_OBJS.get(i), GOOD_NSID_STRINGS.get(i) });
+    private static Stream<Object[]> goodToStringDataStream(Method m) {
+        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
+        if (methodParamTypes.contains(NamespaceId.class)) {
+            int count = GOOD_NSID_STRING_OBJS.size();
+            return IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRING_OBJS.get(i), GOOD_NSID_STRINGS.get(i) });
+        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
+            int count = GOOD_TNSID_STRING_OBJS.size();
+            return IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRING_OBJS.get(i), GOOD_TNSID_STRINGS.get(i) });
+        } else {
+            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
+        }
     }
 
     @DataProvider

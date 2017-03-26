@@ -18,8 +18,10 @@ package io.github.davejoyce.id;
 
 import java.lang.reflect.Constructor;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 
+import static io.github.davejoyce.util.Arguments.requireNonEmpty;
 import static io.github.davejoyce.util.Arguments.requireNonNull;
 
 /**
@@ -35,16 +37,22 @@ import static io.github.davejoyce.util.Arguments.requireNonNull;
 public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T> {
 
     public static <T extends Comparable<T>> TemporalNamespaceId<T> fromString(String idString, Class<T> idType) {
-        int separatorPos1 = idString.indexOf(SEPARATOR);
-        int separatorPos2 = idString.lastIndexOf(SEPARATOR);
+        String rawIdString = requireNonEmpty(idString, "NamespaceId string cannot be empty");
+        int separatorPos1 = rawIdString.indexOf(SEPARATOR);
+        int separatorPos2 = rawIdString.lastIndexOf(SEPARATOR);
         if (-1 == separatorPos1 || separatorPos2 == separatorPos1) {
             throw new IllegalArgumentException("ID string must contain at least 2 '" + SEPARATOR + "' separators");
         }
-        final String namespace = idString.substring(0, separatorPos1);
-        String idVal = idString.substring((separatorPos1 + 1), separatorPos2);
-        String asOfTimeVal = idString.substring((separatorPos2 + 1), idString.length());
+        final String namespace = rawIdString.substring(0, separatorPos1);
+        String idVal = rawIdString.substring((separatorPos1 + 1), separatorPos2);
+        String asOfTimeVal = rawIdString.substring((separatorPos2 + 1), rawIdString.length());
         final T id = convertId(idVal, idType);
-        final Instant asOfTime = Instant.parse(asOfTimeVal);
+        final Instant asOfTime;
+        try {
+            asOfTime = Instant.parse(asOfTimeVal);
+        } catch (DateTimeParseException dtpe) {
+            throw new IllegalArgumentException("Bad 'asOf' timestamp: " + asOfTimeVal, dtpe);
+        }
         return new TemporalNamespaceId<T>(namespace, id, asOfTime);
     }
 

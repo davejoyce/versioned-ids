@@ -27,16 +27,42 @@ import static org.testng.Assert.*;
  */
 public class TemporalNamespaceIdTest {
 
-    @Test
-    public void testFromString() throws Exception {
+    @Test(dataProviderClass = TestSupport.class,
+          dataProvider = "goodDataIterator",
+          groups = "id")
+    public void testFromStringGood(String tnsIdString,
+                                   TemporalNamespaceId<String> expected) throws Exception {
+        TemporalNamespaceId<String> actual = TemporalNamespaceId.fromString(tnsIdString);
+        assertEquals(actual, expected);
     }
 
-    @Test
-    public void testFromString1() throws Exception {
+    @Test(dataProviderClass = TestSupport.class,
+          dataProvider = "badDataIterator",
+          groups = "id",
+          expectedExceptions = IllegalArgumentException.class)
+    public void testFromStringBad(String tnsIdString) throws Exception {
+        TemporalNamespaceId.fromString(tnsIdString);
+        fail("Expected exception on parse of: " + tnsIdString);
     }
 
-    @Test
-    public void testGetAsOfTime() throws Exception {
+    @Test(dataProviderClass = TestSupport.class,
+          dataProvider = "goodDataIterator",
+          groups = "id")
+    public <T extends Comparable<T>> void testFromStringWithTypeGood(String tnsIdString,
+                                                                     Class<T> idType,
+                                                                     TemporalNamespaceId<T> expected) throws Exception {
+        TemporalNamespaceId<T> actual = TemporalNamespaceId.fromString(tnsIdString, idType);
+        assertEquals(actual, expected);
+    }
+
+    @Test(dataProviderClass = TestSupport.class,
+          dataProvider = "badDataIterator",
+          groups = "id",
+          expectedExceptions = IllegalArgumentException.class)
+    public <T extends Comparable<T>> void testFromStringWithTypeBad(String tnsIdString,
+                                                                    Class<T> idType) throws Exception {
+        TemporalNamespaceId.fromString(tnsIdString, idType);
+        fail("Expected exception on parse of: " + tnsIdString);
     }
 
     @Test(dataProviderClass = TestSupport.class,
@@ -86,8 +112,12 @@ public class TemporalNamespaceIdTest {
         }
     }
 
-    @Test
-    public void testToString() throws Exception {
+    @Test(dataProviderClass = TestSupport.class,
+          dataProvider = "goodToStringDataIterator",
+          groups = "id")
+    public void testToString(TemporalNamespaceId<?> tnsId, String expected) throws Exception {
+        String actual = tnsId.toString();
+        assertEquals(actual, expected);
     }
 
 }

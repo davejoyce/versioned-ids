@@ -27,7 +27,7 @@ import static org.testng.Assert.*;
  */
 public class ArgumentsTest {
 
-    @Test
+    @Test(groups = "util")
     public void testRequireNonNull() throws Exception {
         Integer i = Arguments.requireNonNull(1);
         try {
@@ -38,7 +38,7 @@ public class ArgumentsTest {
         }
     }
 
-    @Test
+    @Test(groups = "util")
     public void testRequireNonNullWithMessage() throws Exception {
         String expectedMsg = "Integer argument cannot be null";
         Integer i = Arguments.requireNonNull(1, expectedMsg);
@@ -50,7 +50,7 @@ public class ArgumentsTest {
         }
     }
 
-    @Test
+    @Test(groups = "util")
     public void testRequireNonEmpty() throws Exception {
         String s = Arguments.requireNonEmpty("test");
         try {
@@ -61,7 +61,7 @@ public class ArgumentsTest {
         }
     }
 
-    @Test
+    @Test(groups = "util")
     public void testRequireNonEmptyWithMessage() throws Exception {
         String expectedMsg = "Missing text argument";
         String s = Arguments.requireNonEmpty("test", expectedMsg);

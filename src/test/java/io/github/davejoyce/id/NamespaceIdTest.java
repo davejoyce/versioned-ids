@@ -28,7 +28,8 @@ import static org.testng.Assert.*;
 public class NamespaceIdTest {
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodDataIterator")
+          dataProvider = "goodDataIterator",
+          groups = "id")
     public void testFromStringGood(String nsIdString,
                                    NamespaceId<String> expected) throws Exception {
         NamespaceId<String> actual = NamespaceId.fromString(nsIdString);
@@ -37,6 +38,7 @@ public class NamespaceIdTest {
 
     @Test(dataProviderClass = TestSupport.class,
           dataProvider = "badDataIterator",
+          groups = "id",
           expectedExceptions = IllegalArgumentException.class)
     public void testFromStringBad(String nsIdString) throws Exception {
         NamespaceId.fromString(nsIdString);
@@ -44,7 +46,8 @@ public class NamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodDataIterator")
+          dataProvider = "goodDataIterator",
+          groups = "id")
     public <T extends Comparable<T>> void testFromStringWithTypeGood(String nsIdString,
                                                                      Class<T> idType,
                                                                      NamespaceId<T> expected) throws Exception {
@@ -54,6 +57,7 @@ public class NamespaceIdTest {
 
     @Test(dataProviderClass = TestSupport.class,
           dataProvider = "badDataIterator",
+          groups = "id",
           expectedExceptions = IllegalArgumentException.class)
     public <T extends Comparable<T>> void testFromStringWithTypeBad(String nsIdString,
                                                                     Class<T> idType) throws Exception {
@@ -62,19 +66,22 @@ public class NamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodGetterDataIterator")
+          dataProvider = "goodGetterDataIterator",
+          groups = "id")
     public void testGetNamespace(NamespaceId<?> nsId) throws Exception {
         assertNotNull(nsId.getNamespace());
     }
 
     @Test(dataProviderClass = TestSupport.class,
-            dataProvider = "goodGetterDataIterator")
+          dataProvider = "goodGetterDataIterator",
+          groups = "id")
     public void testGetId(NamespaceId<?> nsId) throws Exception {
         assertNotNull(nsId.getId());
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray")
+          dataProvider = "equalityDataArray",
+          groups = "id")
     public <T extends Comparable<T>> void testEquals(NamespaceId<T> nsId1,
                                                      NamespaceId<T> nsId2,
                                                      boolean expectedEqual) throws Exception {
@@ -85,7 +92,8 @@ public class NamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray")
+          dataProvider = "equalityDataArray",
+          groups = "id")
     public void testHashCode(NamespaceId<?> nsId1, NamespaceId<?> nsId2, boolean expectedEqual) throws Exception {
         int actual1 = nsId1.hashCode();
         int actual2 = (null != nsId2) ? nsId2.hashCode() : -1;
@@ -97,7 +105,8 @@ public class NamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "compareToDataArray")
+          dataProvider = "compareToDataArray",
+          groups = "id")
     public <T extends Comparable<T>> void testCompareTo(NamespaceId<T> nsId1,
                                                         NamespaceId<T> nsId2,
                                                         int expectedResultFlag) throws Exception {
@@ -118,7 +127,8 @@ public class NamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodToStringDataIterator")
+          dataProvider = "goodToStringDataIterator",
+          groups = "id")
     public void testToString(NamespaceId<?> nsId, String expected) throws Exception {
         String actual = nsId.toString();
         assertEquals(actual, expected);

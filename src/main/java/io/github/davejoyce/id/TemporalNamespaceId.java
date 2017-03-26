@@ -67,10 +67,6 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
         this(namespace, id, requireNonNull(asOfTime).getEpochSecond(), requireNonNull(asOfTime).getNano());
     }
 
-    public TemporalNamespaceId(String namespace, T id) {
-        this(namespace, id, Instant.now());
-    }
-
     public Instant getAsOfTime() {
         return Instant.ofEpochSecond(asOfTime[0], asOfTime[1]);
     }

@@ -90,7 +90,7 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
      * @return converted ID attribute
      */
     protected static <T extends Comparable<T>> T convertId(String idValue, Class<T> idType) {
-        final T id;
+        T id;
         try {
             // 1. Look for standard 'valueOf' factory method on type
             Method valueOfMethod = idType.getMethod("valueOf", String.class);

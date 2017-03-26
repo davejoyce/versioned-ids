@@ -19,10 +19,8 @@ package io.github.davejoyce.id;
 import org.testng.annotations.DataProvider;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -116,27 +114,57 @@ public final class TestSupport {
 
     @DataProvider
     public static Object[][] equalityDataArray(Method m) {
-        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
-        return new Object[][] {
-            new Object[] { new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 1), true },
-            new Object[] { new NamespaceId<Float>("namespace", 3.141592F), new NamespaceId<Float>("namespace", 3.141592F), true },
-            new Object[] { new NamespaceId<String>("namespace", "id"), new NamespaceId<String>("namespace", "ID"), false },
-            new Object[] { new NamespaceId<Integer>("namespace", 1), null, false },
-            new Object[] { nsId, nsId, true },
-        };
+        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
+        if (methodParamTypes.contains(NamespaceId.class)) {
+            final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
+            return new Object[][] {
+                    new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 1), true},
+                    new Object[]{new NamespaceId<Float>("namespace", 3.141592F), new NamespaceId<Float>("namespace", 3.141592F), true},
+                    new Object[]{new NamespaceId<String>("namespace", "id"), new NamespaceId<String>("namespace", "ID"), false},
+                    new Object[]{new NamespaceId<Integer>("namespace", 1), null, false},
+                    new Object[]{nsId, nsId, true},
+            };
+        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
+            final Instant asOfTime = Instant.now();
+            final Instant nextTime = asOfTime.plusSeconds(3600L); // add 1 hour
+            final TemporalNamespaceId<Integer> tnsId = new TemporalNamespaceId<Integer>("identity", 10, asOfTime);
+            return new Object[][] {
+                new Object[]{new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), true},
+                new Object[]{new TemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime), new TemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime), true},
+                new Object[]{new TemporalNamespaceId<String>("namespace", "id", asOfTime), new TemporalNamespaceId<String>("namespace", "ID", asOfTime), false},
+                new Object[]{new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), null, false},
+                new Object[]{tnsId, tnsId, true},
+            };
+        } else {
+            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
+        }
     }
 
     @DataProvider
     public static Object[][] compareToDataArray(Method m) {
-        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
-        return new Object[][] {
-            new Object[] { new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 2), BEFORE },
-            new Object[] { new NamespaceId<Integer>("apples", 1), new NamespaceId<Integer>("bananas", 1), BEFORE },
-            new Object[] { new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 1), AFTER },
-            new Object[] { new NamespaceId<Integer>("bananas", 1), new NamespaceId<Integer>("apples", 1), AFTER },
-            new Object[] { new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 2), EQUAL },
-            new Object[] { nsId, nsId, EQUAL },
-        };
+        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
+        if (methodParamTypes.contains(NamespaceId.class)) {
+            final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
+            return new Object[][] {
+                    new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 2), BEFORE},
+                    new Object[]{new NamespaceId<Integer>("apples", 1), new NamespaceId<Integer>("bananas", 1), BEFORE},
+                    new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 1), AFTER},
+                    new Object[]{new NamespaceId<Integer>("bananas", 1), new NamespaceId<Integer>("apples", 1), AFTER},
+                    new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 2), EQUAL},
+                    new Object[]{nsId, nsId, EQUAL},
+            };
+        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
+            final Instant asOfTime = Instant.now();
+            final Instant nextTime = asOfTime.plusSeconds(3600L); // add 1 hour
+            final TemporalNamespaceId<Integer> tnsId = new TemporalNamespaceId<Integer>("identity", 10, asOfTime);
+            return new Object[][] {
+                    new Object[]{new TemporalNamespaceId<Integer>("apples", 1, asOfTime), new TemporalNamespaceId<Integer>("apples", 1, nextTime), BEFORE},
+                    new Object[]{new TemporalNamespaceId<Integer>("apples", 1, nextTime), new TemporalNamespaceId<Integer>("apples", 1, asOfTime), AFTER},
+                    new Object[]{tnsId, tnsId, EQUAL},
+            };
+        } else {
+            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
+        }
     }
 
 }

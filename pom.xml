@@ -9,7 +9,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <name>Versioned IDs</name>
-    <description>Testbed for namespaced ID and versioned objects</description>
+    <description>Namespaced and versioned ID objects</description>
     <inceptionYear>2016</inceptionYear>
 
     <licenses>
@@ -25,9 +25,21 @@
         <project.build.javaVersion>1.8</project.build.javaVersion>
         <project.reporting.outputVersion>UTF-8</project.reporting.outputVersion>
 
+        <!-- Dependency versions -->
+        <testng.version>6.11</testng.version>
+
         <!-- Plugin versions -->
         <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <version>${testng.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>

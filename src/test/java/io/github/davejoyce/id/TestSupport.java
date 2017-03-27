@@ -44,10 +44,14 @@ public final class TestSupport {
     private static final List<String> GOOD_TNSID_STRINGS = new ArrayList<>();
     private static final List<TemporalNamespaceId<String>> GOOD_TNSID_STRING_OBJS = new ArrayList<>();
     private static final List<TemporalNamespaceId<?>> GOOD_TNSID_TYPED_OBJS = new ArrayList<>();
+    private static final List<String> GOOD_BTNSID_STRINGS = new ArrayList<>();
+    private static final List<BiTemporalNamespaceId<String>> GOOD_BTNSID_STRING_OBJS = new ArrayList<>();
+    private static final List<BiTemporalNamespaceId<?>> GOOD_BTNSID_TYPED_OBJS = new ArrayList<>();
     private static final List<Class<? extends Comparable<?>>> GOOD_ID_TYPES = new ArrayList<>();
 
     private static final List<String> BAD_NSID_STRINGS = new ArrayList<>();
     private static final List<String> BAD_TNSID_STRINGS = new ArrayList<>();
+    private static final List<String> BAD_BTNSID_STRINGS = new ArrayList<>();
     private static final List<Class<? extends Comparable<?>>> BAD_ID_TYPES = new ArrayList<>();
 
     static {
@@ -61,6 +65,9 @@ public final class TestSupport {
         GOOD_TNSID_STRINGS.add("temporal/id/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
         GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
+        GOOD_BTNSID_STRINGS.add("bitemporal/id/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
+        GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "id", asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "id", asOfTime, asAtTime));
         GOOD_ID_TYPES.add(String.class);
         BAD_ID_TYPES.add(Integer.class);
 
@@ -70,6 +77,9 @@ public final class TestSupport {
         GOOD_TNSID_STRINGS.add("temporal/2/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "2", asOfTime));
         GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 2, asOfTime));
+        GOOD_BTNSID_STRINGS.add("bitemporal/2/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
+        GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "2", asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", 2, asOfTime, asAtTime));
         GOOD_ID_TYPES.add(Integer.class);
         BAD_ID_TYPES.add(Date.class);
 
@@ -79,6 +89,9 @@ public final class TestSupport {
         GOOD_TNSID_STRINGS.add("temporal/3.141592/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "3.141592", asOfTime));
         GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 3.141592F, asOfTime));
+        GOOD_BTNSID_STRINGS.add("bitemporal/3.141592/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
+        GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "3.141592", asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", 3.141592F, asOfTime, asAtTime));
         GOOD_ID_TYPES.add(Float.class);
         BAD_ID_TYPES.add(Integer.class);
 
@@ -90,6 +103,11 @@ public final class TestSupport {
         BAD_TNSID_STRINGS.add("");
         BAD_TNSID_STRINGS.add("temporal/2");
         BAD_TNSID_STRINGS.add("temporal/2/1977-11-13");
+        BAD_BTNSID_STRINGS.add(null);
+        BAD_BTNSID_STRINGS.add("");
+        BAD_BTNSID_STRINGS.add("bitemporal/2");
+        BAD_BTNSID_STRINGS.add("bitemporal/2/1977-11-13T14:18:00Z");
+        BAD_BTNSID_STRINGS.add("bitemporal/2/1977-11-13T14:18:00Z/2008-01-05");
     }
 
     private TestSupport() {}
@@ -121,6 +139,11 @@ public final class TestSupport {
             return (withType)
                     ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_TNSID_TYPED_OBJS.get(i) })
                     : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_TNSID_STRING_OBJS.get(i) });
+        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
+            int count = GOOD_BTNSID_STRINGS.size();
+            return (withType)
+                    ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_BTNSID_TYPED_OBJS.get(i) })
+                    : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRINGS.get(i), GOOD_BTNSID_STRING_OBJS.get(i) });
         } else {
             throw new IllegalArgumentException("Unsupported test method: " + m.toString());
         }
@@ -140,6 +163,8 @@ public final class TestSupport {
                 return BAD_NSID_STRINGS.stream().map(bad_nsid_string -> new Object[]{bad_nsid_string});
             } else if (TemporalNamespaceIdTest.class.equals(testClass)) {
                 return BAD_TNSID_STRINGS.stream().map(bad_tnsid_string -> new Object[]{bad_tnsid_string});
+            } else if (BiTemporalNamespaceIdTest.class.equals(testClass)) {
+                return BAD_BTNSID_STRINGS.stream().map(bad_btnsid_string -> new Object[]{bad_btnsid_string});
             } else {
                 throw new IllegalArgumentException("Unsupported test class: " + testClass.getCanonicalName());
             }
@@ -148,6 +173,8 @@ public final class TestSupport {
                 return IntStream.range(0, GOOD_NSID_STRINGS.size()).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), BAD_ID_TYPES.get(i) });
             } else if (TemporalNamespaceIdTest.class.equals(testClass)) {
                 return IntStream.range(0, GOOD_TNSID_STRINGS.size()).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), BAD_ID_TYPES.get(i) });
+            } else if (BiTemporalNamespaceIdTest.class.equals(testClass)) {
+                return IntStream.range(0, GOOD_BTNSID_STRINGS.size()).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRINGS.get(i), BAD_ID_TYPES.get(i) });
             } else {
                 throw new IllegalArgumentException("Unsupported test class: " + testClass.getCanonicalName());
             }
@@ -169,6 +196,9 @@ public final class TestSupport {
         } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
             int count = GOOD_TNSID_STRING_OBJS.size();
             return IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRING_OBJS.get(i), GOOD_TNSID_STRINGS.get(i) });
+        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
+            int count = GOOD_BTNSID_STRING_OBJS.size();
+            return IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRING_OBJS.get(i), GOOD_BTNSID_STRINGS.get(i) });
         } else {
             throw new IllegalArgumentException("Unsupported test method: " + m.toString());
         }
@@ -197,6 +227,17 @@ public final class TestSupport {
                 new Object[]{new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), null, false},
                 new Object[]{tnsId, tnsId, true},
             };
+        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
+            final Instant asOfTime = Instant.now();
+            final Instant asAtTime = asOfTime.plusSeconds(3600L); // add 1 hour
+            final BiTemporalNamespaceId<Integer> btnsId = new BiTemporalNamespaceId<Integer>("identity", 10, asOfTime, asAtTime);
+            return new Object[][] {
+                    new Object[]{new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), true},
+                    new Object[]{new BiTemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime, asAtTime), new BiTemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime, asAtTime), true},
+                    new Object[]{new BiTemporalNamespaceId<String>("namespace", "id", asOfTime, asAtTime), new BiTemporalNamespaceId<String>("namespace", "ID", asOfTime, asAtTime), false},
+                    new Object[]{new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), null, false},
+                    new Object[]{btnsId, btnsId, true},
+            };
         } else {
             throw new IllegalArgumentException("Unsupported test method: " + m.toString());
         }
@@ -224,7 +265,17 @@ public final class TestSupport {
                     new Object[]{new TemporalNamespaceId<Integer>("apples", 1, nextTime), new TemporalNamespaceId<Integer>("apples", 1, asOfTime), AFTER},
                     new Object[]{tnsId, tnsId, EQUAL},
             };
-        } else {
+        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
+            final Instant asOfTime = Instant.now();
+            final Instant asAtTime = asOfTime.plusSeconds(3600L); // add 1 hour
+            final Instant nextTime = asAtTime.plusSeconds(3600L); // add 1 hour
+            final BiTemporalNamespaceId<Integer> btnsId = new BiTemporalNamespaceId<Integer>("identity", 10, asOfTime, asAtTime);
+            return new Object[][] {
+                    new Object[]{new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, asAtTime), new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, nextTime), BEFORE},
+                    new Object[]{new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, nextTime), new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, asAtTime), AFTER},
+                    new Object[]{btnsId, btnsId, EQUAL},
+            };
+        }else {
             throw new IllegalArgumentException("Unsupported test method: " + m.toString());
         }
     }

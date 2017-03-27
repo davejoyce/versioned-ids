@@ -37,7 +37,7 @@ import static io.github.davejoyce.util.Arguments.requireNonNull;
 public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T> {
 
     public static <T extends Comparable<T>> TemporalNamespaceId<T> fromString(String idString, Class<T> idType) {
-        String rawIdString = requireNonEmpty(idString, "NamespaceId string cannot be empty");
+        String rawIdString = requireNonEmpty(idString, "TemporalNamespaceId string cannot be empty");
         int separatorPos1 = rawIdString.indexOf(SEPARATOR);
         int separatorPos2 = rawIdString.lastIndexOf(SEPARATOR);
         if (-1 == separatorPos1 || separatorPos2 == separatorPos1) {

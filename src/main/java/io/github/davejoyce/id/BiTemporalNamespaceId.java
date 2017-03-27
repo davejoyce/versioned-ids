@@ -16,10 +16,11 @@
 
 package io.github.davejoyce.id;
 
-import java.lang.reflect.Constructor;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 
+import static io.github.davejoyce.util.Arguments.requireNonEmpty;
 import static io.github.davejoyce.util.Arguments.requireNonNull;
 
 /**
@@ -35,19 +36,26 @@ import static io.github.davejoyce.util.Arguments.requireNonNull;
 public class BiTemporalNamespaceId<T extends Comparable<T>> extends TemporalNamespaceId<T> {
 
     public static <T extends Comparable<T>> BiTemporalNamespaceId<T> fromString(String idString, Class<T> idType) {
-        int separatorPos1 = idString.indexOf(SEPARATOR);
-        int separatorPos2 = idString.indexOf(SEPARATOR, (separatorPos1 + 1));
-        int separatorPos3 = idString.lastIndexOf(SEPARATOR);
+        String rawIdString = requireNonEmpty(idString, "BiTemporalNamespaceId string cannot be empty");
+        int separatorPos1 = rawIdString.indexOf(SEPARATOR);
+        int separatorPos2 = rawIdString.indexOf(SEPARATOR, (separatorPos1 + 1));
+        int separatorPos3 = rawIdString.lastIndexOf(SEPARATOR);
         if (-1 == separatorPos1 || -1 == separatorPos2 || separatorPos3 == separatorPos2) {
             throw new IllegalArgumentException("ID string must contain at least 3 '" + SEPARATOR + "' separators");
         }
-        final String namespace = idString.substring(0, separatorPos1);
-        String idVal = idString.substring((separatorPos1 + 1), separatorPos2);
-        String asOfTimeVal = idString.substring((separatorPos2 + 1), separatorPos3);
-        String asAtTimeVal = idString.substring((separatorPos3 + 1), idString.length());
+        final String namespace = rawIdString.substring(0, separatorPos1);
+        String idVal = rawIdString.substring((separatorPos1 + 1), separatorPos2);
+        String asOfTimeVal = rawIdString.substring((separatorPos2 + 1), separatorPos3);
+        String asAtTimeVal = rawIdString.substring((separatorPos3 + 1), rawIdString.length());
         final T id = convertId(idVal, idType);
-        final Instant asOfTime = Instant.parse(asOfTimeVal);
-        final Instant asAtTime = Instant.parse(asAtTimeVal);
+        final Instant asOfTime;
+        final Instant asAtTime;
+        try {
+            asOfTime = Instant.parse(asOfTimeVal);
+            asAtTime = Instant.parse(asAtTimeVal);
+        } catch (DateTimeParseException dtpe) {
+            throw new IllegalArgumentException("Bad timestamp segment", dtpe);
+        }
         return new BiTemporalNamespaceId<>(namespace, id, asOfTime, asAtTime);
     }
 
@@ -75,14 +83,6 @@ public class BiTemporalNamespaceId<T extends Comparable<T>> extends TemporalName
         this(namespace, id,
                 requireNonNull(asOfTime).getEpochSecond(), requireNonNull(asOfTime).getNano(),
                 requireNonNull(asAtTime).getEpochSecond(), requireNonNull(asAtTime).getNano());
-    }
-
-    public BiTemporalNamespaceId(String namespace, T id, Instant asOfTime) {
-        this(namespace, id, asOfTime, Instant.now());
-    }
-
-    public BiTemporalNamespaceId(String namespace, T id) {
-        this(namespace, id, Instant.now(), Instant.now());
     }
 
     public Instant getAsAtTime() {

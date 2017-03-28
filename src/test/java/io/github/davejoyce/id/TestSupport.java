@@ -61,37 +61,37 @@ public final class TestSupport {
 
         GOOD_NSID_STRINGS.add("namespace/id");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "id"));
-        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", "id"));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<String>("namespace", "id"));
         GOOD_TNSID_STRINGS.add("temporal/id/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
-        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<String>("temporal", "id", asOfTime));
         GOOD_BTNSID_STRINGS.add("bitemporal/id/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
         GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "id", asOfTime, asAtTime));
-        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "id", asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<String>("bitemporal", "id", asOfTime, asAtTime));
         GOOD_ID_TYPES.add(String.class);
         BAD_ID_TYPES.add(Integer.class);
 
         GOOD_NSID_STRINGS.add("namespace/2");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "2"));
-        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", 2));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<Integer>("namespace", 2));
         GOOD_TNSID_STRINGS.add("temporal/2/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "2", asOfTime));
-        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 2, asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<Integer>("temporal", 2, asOfTime));
         GOOD_BTNSID_STRINGS.add("bitemporal/2/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
         GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "2", asOfTime, asAtTime));
-        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", 2, asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<Integer>("bitemporal", 2, asOfTime, asAtTime));
         GOOD_ID_TYPES.add(Integer.class);
         BAD_ID_TYPES.add(Date.class);
 
         GOOD_NSID_STRINGS.add("namespace/3.141592");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "3.141592"));
-        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", 3.141592F));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<Float>("namespace", 3.141592F));
         GOOD_TNSID_STRINGS.add("temporal/3.141592/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "3.141592", asOfTime));
-        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 3.141592F, asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<Float>("temporal", 3.141592F, asOfTime));
         GOOD_BTNSID_STRINGS.add("bitemporal/3.141592/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
         GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "3.141592", asOfTime, asAtTime));
-        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", 3.141592F, asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<Float>("bitemporal", 3.141592F, asOfTime, asAtTime));
         GOOD_ID_TYPES.add(Float.class);
         BAD_ID_TYPES.add(Integer.class);
 

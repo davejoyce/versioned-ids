@@ -1,3 +1,3 @@
-# Versioned IDs 1.0-SNAPSHOT
+# ${project.name} ${project.version}
 
 Versioned, namespace-aware ID types

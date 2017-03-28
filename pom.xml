@@ -9,7 +9,8 @@
     <version>1.0-SNAPSHOT</version>
 
     <name>Versioned IDs</name>
-    <description>Namespaced and versioned ID objects</description>
+    <description>Versioned, namespace-aware ID types</description>
+    <url>https://github.com/davejoyce/versioned-ids</url>
     <inceptionYear>2016</inceptionYear>
 
     <licenses>
@@ -20,16 +21,40 @@
         </license>
     </licenses>
 
+    <scm>
+        <connection>scm:git:https://github.com/davejoyce/versioned-ids.git</connection>
+        <developerConnection>scm:git:git@github.com:davejoyce/versioned-ids.git</developerConnection>
+        <url>https://github.com/davejoyce/versioned-ids</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/davejoyce/versioned-ids/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>davejoyce</id>
+            <name>Dave Joyce</name>
+            <email>dave@osframework.org</email>
+            <url>https://github.com/davejoyce/</url>
+        </developer>
+    </developers>
+
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.javaVersion>1.8</project.build.javaVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputVersion>UTF-8</project.reporting.outputVersion>
 
         <!-- Dependency versions -->
         <testng.version>6.11</testng.version>
 
         <!-- Plugin versions -->
-        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+        <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
+        <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+        <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
+        <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
     </properties>
 
     <dependencies>
@@ -45,12 +70,77 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>${maven-resources-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>filter-metadata</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/non-packaged-resources</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${project.build.javaVersion}</source>
                     <target>${project.build.javaVersion}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadoc</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

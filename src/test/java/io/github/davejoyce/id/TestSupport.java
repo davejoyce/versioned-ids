@@ -34,10 +34,6 @@ import java.util.stream.Stream;
  */
 public final class TestSupport {
 
-    public static final int BEFORE = -1;
-    public static final int EQUAL  = 0;
-    public static final int AFTER  = 1;
-
     private static final List<String> GOOD_NSID_STRINGS = new ArrayList<>();
     private static final List<NamespaceId<String>> GOOD_NSID_STRING_OBJS = new ArrayList<>();
     private static final List<NamespaceId<?>> GOOD_NSID_TYPED_OBJS = new ArrayList<>();
@@ -223,82 +219,6 @@ public final class TestSupport {
             int count = GOOD_BTNSID_STRING_OBJS.size();
             return IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRING_OBJS.get(i), GOOD_BTNSID_STRINGS.get(i) });
         } else {
-            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
-        }
-    }
-
-    @DataProvider
-    public static Object[][] equalityDataArray(Method m) {
-        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
-        if (methodParamTypes.contains(NamespaceId.class)) {
-            final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
-            return new Object[][] {
-                    new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 1), true},
-                    new Object[]{new NamespaceId<Float>("namespace", 3.141592F), new NamespaceId<Float>("namespace", 3.141592F), true},
-                    new Object[]{new NamespaceId<String>("namespace", "id"), new NamespaceId<String>("namespace", "ID"), false},
-                    new Object[]{new NamespaceId<Integer>("namespace", 1), null, false},
-                    new Object[]{nsId, nsId, true},
-            };
-        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
-            final Instant asOfTime = Instant.now();
-            final Instant nextTime = asOfTime.plusSeconds(3600L); // add 1 hour
-            final TemporalNamespaceId<Integer> tnsId = new TemporalNamespaceId<Integer>("identity", 10, asOfTime);
-            return new Object[][] {
-                new Object[]{new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), true},
-                new Object[]{new TemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime), new TemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime), true},
-                new Object[]{new TemporalNamespaceId<String>("namespace", "id", asOfTime), new TemporalNamespaceId<String>("namespace", "ID", asOfTime), false},
-                new Object[]{new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), null, false},
-                new Object[]{tnsId, tnsId, true},
-            };
-        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
-            final Instant asOfTime = Instant.now();
-            final Instant asAtTime = asOfTime.plusSeconds(3600L); // add 1 hour
-            final BiTemporalNamespaceId<Integer> btnsId = new BiTemporalNamespaceId<Integer>("identity", 10, asOfTime, asAtTime);
-            return new Object[][] {
-                    new Object[]{new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), true},
-                    new Object[]{new BiTemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime, asAtTime), new BiTemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime, asAtTime), true},
-                    new Object[]{new BiTemporalNamespaceId<String>("namespace", "id", asOfTime, asAtTime), new BiTemporalNamespaceId<String>("namespace", "ID", asOfTime, asAtTime), false},
-                    new Object[]{new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), null, false},
-                    new Object[]{btnsId, btnsId, true},
-            };
-        } else {
-            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
-        }
-    }
-
-    @DataProvider
-    public static Object[][] compareToDataArray(Method m) {
-        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
-        if (methodParamTypes.contains(NamespaceId.class)) {
-            final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
-            return new Object[][] {
-                    new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 2), BEFORE},
-                    new Object[]{new NamespaceId<Integer>("apples", 1), new NamespaceId<Integer>("bananas", 1), BEFORE},
-                    new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 1), AFTER},
-                    new Object[]{new NamespaceId<Integer>("bananas", 1), new NamespaceId<Integer>("apples", 1), AFTER},
-                    new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 2), EQUAL},
-                    new Object[]{nsId, nsId, EQUAL},
-            };
-        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
-            final Instant asOfTime = Instant.now();
-            final Instant nextTime = asOfTime.plusSeconds(3600L); // add 1 hour
-            final TemporalNamespaceId<Integer> tnsId = new TemporalNamespaceId<Integer>("identity", 10, asOfTime);
-            return new Object[][] {
-                    new Object[]{new TemporalNamespaceId<Integer>("apples", 1, asOfTime), new TemporalNamespaceId<Integer>("apples", 1, nextTime), BEFORE},
-                    new Object[]{new TemporalNamespaceId<Integer>("apples", 1, nextTime), new TemporalNamespaceId<Integer>("apples", 1, asOfTime), AFTER},
-                    new Object[]{tnsId, tnsId, EQUAL},
-            };
-        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
-            final Instant asOfTime = Instant.now();
-            final Instant asAtTime = asOfTime.plusSeconds(3600L); // add 1 hour
-            final Instant nextTime = asAtTime.plusSeconds(3600L); // add 1 hour
-            final BiTemporalNamespaceId<Integer> btnsId = new BiTemporalNamespaceId<Integer>("identity", 10, asOfTime, asAtTime);
-            return new Object[][] {
-                    new Object[]{new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, asAtTime), new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, nextTime), BEFORE},
-                    new Object[]{new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, nextTime), new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, asAtTime), AFTER},
-                    new Object[]{btnsId, btnsId, EQUAL},
-            };
-        }else {
             throw new IllegalArgumentException("Unsupported test method: " + m.toString());
         }
     }

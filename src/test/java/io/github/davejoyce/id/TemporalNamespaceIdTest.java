@@ -16,7 +16,10 @@
 
 package io.github.davejoyce.id;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.time.Instant;
 
 import static org.testng.Assert.*;
 
@@ -25,7 +28,7 @@ import static org.testng.Assert.*;
  *
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
-public class TemporalNamespaceIdTest {
+public class TemporalNamespaceIdTest extends AbstractIdTest {
 
     @Test(dataProviderClass = TestSupport.class,
           dataProvider = "goodTemporalNamespaceIdStringIterator",
@@ -66,58 +69,36 @@ public class TemporalNamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testEquals(TemporalNamespaceId<T> tnsId1,
-                                                     TemporalNamespaceId<T> tnsId2,
-                                                     boolean expectedEqual) throws Exception {
-        boolean actual = tnsId1.equals(tnsId2);
-        assertEquals(actual, expectedEqual);
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testHashCode(TemporalNamespaceId<T> tnsId1,
-                                                       TemporalNamespaceId<T> tnsId2,
-                                                       boolean expectedEqual) throws Exception {
-        int actual1 = tnsId1.hashCode();
-        int actual2 = (null != tnsId2) ? tnsId2.hashCode() : -1;
-        if (expectedEqual) {
-            assertEquals(actual1, actual2);
-        } else {
-            assertNotEquals(actual1, actual2);
-        }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "compareToDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testCompareTo(TemporalNamespaceId<T> tnsId1,
-                                                        TemporalNamespaceId<T> tnsId2,
-                                                        int expectedResultFlag) throws Exception {
-        int actual = tnsId1.compareTo(tnsId2);
-        switch (expectedResultFlag) {
-            case TestSupport.BEFORE:
-                assertTrue(0 > actual);
-                break;
-            case TestSupport.EQUAL:
-                assertTrue(0 == actual);
-                break;
-            case TestSupport.AFTER:
-                assertTrue(0 < actual);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
           dataProvider = "goodToStringDataIterator",
           groups = "id")
     public void testToString(TemporalNamespaceId<?> tnsId, String expected) throws Exception {
         String actual = tnsId.toString();
         assertEquals(actual, expected);
+    }
+
+    @DataProvider
+    public Object[][] compareToData() {
+        final Instant asOfTime = Instant.now();
+        final Instant nextTime = asOfTime.plusSeconds(3600L); // add 1 hour
+        final TemporalNamespaceId<Integer> tnsId = new TemporalNamespaceId<Integer>("identity", 10, asOfTime);
+        return new Object[][] {
+                new Object[]{new TemporalNamespaceId<Integer>("apples", 1, asOfTime), new TemporalNamespaceId<Integer>("apples", 1, nextTime), BEFORE},
+                new Object[]{new TemporalNamespaceId<Integer>("apples", 1, nextTime), new TemporalNamespaceId<Integer>("apples", 1, asOfTime), AFTER},
+                new Object[]{tnsId, tnsId, EQUAL},
+        };
+    }
+
+    @DataProvider
+    public Object[][] equalityData() {
+        final Instant asOfTime = Instant.now();
+        final TemporalNamespaceId<Integer> tnsId = new TemporalNamespaceId<Integer>("identity", 10, asOfTime);
+        return new Object[][] {
+                new Object[]{new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), true},
+                new Object[]{new TemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime), new TemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime), true},
+                new Object[]{new TemporalNamespaceId<String>("namespace", "id", asOfTime), new TemporalNamespaceId<String>("namespace", "ID", asOfTime), false},
+                new Object[]{new TemporalNamespaceId<Integer>("namespace", 1, asOfTime), null, false},
+                new Object[]{tnsId, tnsId, true},
+        };
     }
 
 }

@@ -16,6 +16,7 @@
 
 package io.github.davejoyce.id;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
@@ -25,7 +26,7 @@ import static org.testng.Assert.*;
  *
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
-public class NamespaceIdTest {
+public class NamespaceIdTest extends AbstractIdTest {
 
     @Test(dataProviderClass = TestSupport.class,
           dataProvider = "goodNamespaceIdStringIterator",
@@ -80,58 +81,36 @@ public class NamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testEquals(NamespaceId<T> nsId1,
-                                                     NamespaceId<T> nsId2,
-                                                     boolean expectedEqual) throws Exception {
-        boolean actual1 = nsId1.equals(nsId2);
-        boolean actual2 = (null != nsId2) && nsId2.equals(nsId1);
-        assertEquals(actual1, actual2);
-        assertEquals(actual1, expectedEqual);
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public void testHashCode(NamespaceId<?> nsId1, NamespaceId<?> nsId2, boolean expectedEqual) throws Exception {
-        int actual1 = nsId1.hashCode();
-        int actual2 = (null != nsId2) ? nsId2.hashCode() : -1;
-        if (expectedEqual) {
-            assertEquals(actual1, actual2);
-        } else {
-            assertNotEquals(actual1, actual2);
-        }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "compareToDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testCompareTo(NamespaceId<T> nsId1,
-                                                        NamespaceId<T> nsId2,
-                                                        int expectedResultFlag) throws Exception {
-        int actual = nsId1.compareTo(nsId2);
-        switch (expectedResultFlag) {
-            case TestSupport.BEFORE:
-                assertTrue(0 > actual);
-                break;
-            case TestSupport.EQUAL:
-                assertTrue(0 == actual);
-                break;
-            case TestSupport.AFTER:
-                assertTrue(0 < actual);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
           dataProvider = "goodToStringDataIterator",
           groups = "id")
     public void testToString(NamespaceId<?> nsId, String expected) throws Exception {
         String actual = nsId.toString();
         assertEquals(actual, expected);
+    }
+
+    @DataProvider
+    public Object[][] compareToData() {
+        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
+        return new Object[][] {
+                new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 2), BEFORE},
+                new Object[]{new NamespaceId<Integer>("apples", 1), new NamespaceId<Integer>("bananas", 1), BEFORE},
+                new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 1), AFTER},
+                new Object[]{new NamespaceId<Integer>("bananas", 1), new NamespaceId<Integer>("apples", 1), AFTER},
+                new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 2), EQUAL},
+                new Object[]{nsId, nsId, EQUAL},
+        };
+    }
+
+    @DataProvider
+    public Object[][] equalityData() {
+        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
+        return new Object[][] {
+                new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 1), true},
+                new Object[]{new NamespaceId<Float>("namespace", 3.141592F), new NamespaceId<Float>("namespace", 3.141592F), true},
+                new Object[]{new NamespaceId<String>("namespace", "id"), new NamespaceId<String>("namespace", "ID"), false},
+                new Object[]{new NamespaceId<Integer>("namespace", 1), null, false},
+                new Object[]{nsId, nsId, true},
+        };
     }
 
 }

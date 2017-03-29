@@ -16,7 +16,10 @@
 
 package io.github.davejoyce.id;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.time.Instant;
 
 import static org.testng.Assert.*;
 
@@ -25,7 +28,7 @@ import static org.testng.Assert.*;
  *
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
-public class BiTemporalNamespaceIdTest {
+public class BiTemporalNamespaceIdTest extends AbstractIdTest {
 
     @Test(dataProviderClass = TestSupport.class,
           dataProvider = "goodBiTemporalNamespaceIdStringIterator",
@@ -66,60 +69,38 @@ public class BiTemporalNamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testEquals(BiTemporalNamespaceId<T> btnsId1,
-                                                     BiTemporalNamespaceId<T> btnsId2,
-                                                     boolean expectedEqual) throws Exception {
-        boolean actual1 = btnsId1.equals(btnsId2);
-        boolean actual2 = (null != btnsId2) && btnsId2.equals(btnsId1);
-        assertEquals(actual1, actual2);
-        assertEquals(actual1, expectedEqual);
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public void testHashCode(BiTemporalNamespaceId<?> btnsId1,
-                             BiTemporalNamespaceId<?> btnsId2,
-                             boolean expectedEqual) throws Exception {
-        int actual1 = btnsId1.hashCode();
-        int actual2 = (null != btnsId2) ? btnsId2.hashCode() : -1;
-        if (expectedEqual) {
-            assertEquals(actual1, actual2);
-        } else {
-            assertNotEquals(actual1, actual2);
-        }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "compareToDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testCompareTo(BiTemporalNamespaceId<T> btnsId1,
-                                                        BiTemporalNamespaceId<T> btnsId2,
-                                                        int expectedResultFlag) throws Exception {
-        int actual = btnsId1.compareTo(btnsId2);
-        switch (expectedResultFlag) {
-            case TestSupport.BEFORE:
-                assertTrue(0 > actual);
-                break;
-            case TestSupport.EQUAL:
-                assertTrue(0 == actual);
-                break;
-            case TestSupport.AFTER:
-                assertTrue(0 < actual);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
           dataProvider = "goodToStringDataIterator",
           groups = "id")
     public void testToString(BiTemporalNamespaceId<?> btnsId, String expected) throws Exception {
         String actual = btnsId.toString();
         assertEquals(actual, expected);
+    }
+
+    @DataProvider
+    public Object[][] compareToData() {
+        final Instant asOfTime = Instant.now();
+        final Instant asAtTime = asOfTime.plusSeconds(3600L); // add 1 hour
+        final Instant nextTime = asAtTime.plusSeconds(3600L); // add 1 hour
+        final BiTemporalNamespaceId<Integer> btnsId = new BiTemporalNamespaceId<Integer>("identity", 10, asOfTime, asAtTime);
+        return new Object[][] {
+                new Object[]{new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, asAtTime), new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, nextTime), BEFORE},
+                new Object[]{new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, nextTime), new BiTemporalNamespaceId<Integer>("apples", 1, asOfTime, asAtTime), AFTER},
+                new Object[]{btnsId, btnsId, EQUAL},
+        };
+    }
+
+    @DataProvider
+    public Object[][] equalityData() {
+        final Instant asOfTime = Instant.now();
+        final Instant asAtTime = asOfTime.plusSeconds(3600L); // add 1 hour
+        final BiTemporalNamespaceId<Integer> btnsId = new BiTemporalNamespaceId<Integer>("identity", 10, asOfTime, asAtTime);
+        return new Object[][] {
+                new Object[]{new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), true},
+                new Object[]{new BiTemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime, asAtTime), new BiTemporalNamespaceId<Float>("namespace", 3.141592F, asOfTime, asAtTime), true},
+                new Object[]{new BiTemporalNamespaceId<String>("namespace", "id", asOfTime, asAtTime), new BiTemporalNamespaceId<String>("namespace", "ID", asOfTime, asAtTime), false},
+                new Object[]{new BiTemporalNamespaceId<Integer>("namespace", 1, asOfTime, asAtTime), null, false},
+                new Object[]{btnsId, btnsId, true},
+        };
     }
 
 }

@@ -25,7 +25,7 @@ import static io.github.davejoyce.util.Arguments.requireNonNull;
 
 /**
  * Subclass of {@link TemporalNamespaceId} that holds a high-precision
- * modification timestamp. Instances of this class are {@link Comparable} and
+ * fixing timestamp. Instances of this class are {@link Comparable} and
  * provide 'natural' sort order. Additionally, a {@code BiTemporalNamespaceId}
  * object produces a text representation of itself from which it can later be
  * reconstructed.
@@ -113,6 +113,22 @@ public class BiTemporalNamespaceId<T extends Comparable<T>> extends TemporalName
         comp = Long.valueOf(this.asAtTime[0]).compareTo(that.asAtTime[0]);
         if (0 != comp) return comp;
         return Long.valueOf(this.asAtTime[1]).compareTo(that.asAtTime[1]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public TemporalNamespaceId<T> toTemporalNamespaceId() {
+        return new TemporalNamespaceId<>(getNamespace(), getId(), getAsOfTime());
+    }
+
+    /**
+     * Get {@code BiTemporalNamespaceId} representation of this object.
+     *
+     * @return BiTemporalNamespaceId representation
+     */
+    public BiTemporalNamespaceId<T> toBiTemporalNamespaceId() {
+        return this;
     }
 
     @Override

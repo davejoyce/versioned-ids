@@ -61,37 +61,37 @@ public final class TestSupport {
 
         GOOD_NSID_STRINGS.add("namespace/id");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "id"));
-        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", "id"));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<String>("namespace", "id"));
         GOOD_TNSID_STRINGS.add("temporal/id/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
-        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", "id", asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<String>("temporal", "id", asOfTime));
         GOOD_BTNSID_STRINGS.add("bitemporal/id/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
         GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "id", asOfTime, asAtTime));
-        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "id", asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<String>("bitemporal", "id", asOfTime, asAtTime));
         GOOD_ID_TYPES.add(String.class);
         BAD_ID_TYPES.add(Integer.class);
 
         GOOD_NSID_STRINGS.add("namespace/2");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "2"));
-        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", 2));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<Integer>("namespace", 2));
         GOOD_TNSID_STRINGS.add("temporal/2/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "2", asOfTime));
-        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 2, asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<Integer>("temporal", 2, asOfTime));
         GOOD_BTNSID_STRINGS.add("bitemporal/2/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
         GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "2", asOfTime, asAtTime));
-        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", 2, asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<Integer>("bitemporal", 2, asOfTime, asAtTime));
         GOOD_ID_TYPES.add(Integer.class);
         BAD_ID_TYPES.add(Date.class);
 
         GOOD_NSID_STRINGS.add("namespace/3.141592");
         GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "3.141592"));
-        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<>("namespace", 3.141592F));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<Float>("namespace", 3.141592F));
         GOOD_TNSID_STRINGS.add("temporal/3.141592/1977-11-13T14:18:00Z");
         GOOD_TNSID_STRING_OBJS.add(new TemporalNamespaceId<>("temporal", "3.141592", asOfTime));
-        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<>("temporal", 3.141592F, asOfTime));
+        GOOD_TNSID_TYPED_OBJS.add(new TemporalNamespaceId<Float>("temporal", 3.141592F, asOfTime));
         GOOD_BTNSID_STRINGS.add("bitemporal/3.141592/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z");
         GOOD_BTNSID_STRING_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", "3.141592", asOfTime, asAtTime));
-        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<>("bitemporal", 3.141592F, asOfTime, asAtTime));
+        GOOD_BTNSID_TYPED_OBJS.add(new BiTemporalNamespaceId<Float>("bitemporal", 3.141592F, asOfTime, asAtTime));
         GOOD_ID_TYPES.add(Float.class);
         BAD_ID_TYPES.add(Integer.class);
 
@@ -122,30 +122,53 @@ public final class TestSupport {
     }
 
     @DataProvider
-    public static Iterator<Object[]> goodDataIterator(Method m) {
-        return goodDataStream(m).iterator();
+    public static Iterator<Object[]> goodNamespaceIdStringIterator() {
+        return goodDataStream(NamespaceId.class, false).iterator();
     }
 
-    private static Stream<Object[]> goodDataStream(Method m) {
-        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
-        boolean withType = m.getName().contains("WithType");
-        if (methodParamTypes.contains(NamespaceId.class)) {
+    @DataProvider
+    public static Iterator<Object[]> goodNamespaceIdStringIteratorWithType() {
+        return goodDataStream(NamespaceId.class, true).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodTemporalNamespaceIdStringIterator() {
+        return goodDataStream(TemporalNamespaceId.class, false).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodTemporalNamespaceIdStringIteratorWithType() {
+        return goodDataStream(TemporalNamespaceId.class, true).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodBiTemporalNamespaceIdStringIterator() {
+        return goodDataStream(BiTemporalNamespaceId.class, false).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodBiTemporalNamespaceIdStringIteratorWithType() {
+        return goodDataStream(BiTemporalNamespaceId.class, true).iterator();
+    }
+
+    private static Stream<Object[]> goodDataStream(Class<? extends NamespaceId> testTargetClass, boolean withType) {
+        if (NamespaceId.class.equals(testTargetClass)) {
             int count = GOOD_NSID_STRINGS.size();
             return (withType)
                     ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_NSID_TYPED_OBJS.get(i) })
                     : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_NSID_STRING_OBJS.get(i) });
-        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
+        } else if (TemporalNamespaceId.class.equals(testTargetClass)) {
             int count = GOOD_TNSID_STRINGS.size();
             return (withType)
                     ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_TNSID_TYPED_OBJS.get(i) })
                     : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_TNSID_STRING_OBJS.get(i) });
-        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
+        } else if (BiTemporalNamespaceId.class.equals(testTargetClass)) {
             int count = GOOD_BTNSID_STRINGS.size();
             return (withType)
                     ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_BTNSID_TYPED_OBJS.get(i) })
                     : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRINGS.get(i), GOOD_BTNSID_STRING_OBJS.get(i) });
         } else {
-            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
+            throw new IllegalArgumentException("Unsupported target type: " + testTargetClass);
         }
     }
 

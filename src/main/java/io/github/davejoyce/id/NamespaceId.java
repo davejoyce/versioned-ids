@@ -177,6 +177,15 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
         return this.id.compareTo(o.id);
     }
 
+    /**
+     * Get {@code NamespaceId} representation of this object.
+     *
+     * @return NamespaceId representation
+     */
+    public NamespaceId<T> toNamespaceId() {
+        return this;
+    }
+
     @Override
     public String toString() {
         return namespace + SEPARATOR + id.toString();

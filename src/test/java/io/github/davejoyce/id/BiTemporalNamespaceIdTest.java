@@ -76,6 +76,18 @@ public class BiTemporalNamespaceIdTest extends AbstractIdTest {
         assertEquals(actual, expected);
     }
 
+    @Test
+    @Override
+    public void testToNamespaceId() throws Exception {
+        final Instant asOfTime = Instant.now();
+        final Instant asAtTime = asOfTime.plusSeconds(3600L); // add 1 hour
+        BiTemporalNamespaceId<String> btnsId = new BiTemporalNamespaceId<>("namespace", "id", asOfTime, asAtTime);
+        NamespaceId<String> actual = btnsId.toNamespaceId();
+        NamespaceId<String> expected = new NamespaceId<>("namespace", "id");
+        assertNotSame(actual, btnsId);
+        assertEquals(actual, expected);
+    }
+
     @DataProvider
     public Object[][] compareToData() {
         final Instant asOfTime = Instant.now();

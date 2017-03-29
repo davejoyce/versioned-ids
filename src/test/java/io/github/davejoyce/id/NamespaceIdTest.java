@@ -88,6 +88,14 @@ public class NamespaceIdTest extends AbstractIdTest {
         assertEquals(actual, expected);
     }
 
+    @Test
+    @Override
+    public void testToNamespaceId() throws Exception {
+        NamespaceId<String> expected = new NamespaceId<>("namespace", "id");
+        NamespaceId<String> actual = expected.toNamespaceId();
+        assertSame(actual, expected);
+    }
+
     @DataProvider
     public Object[][] compareToData() {
         final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);

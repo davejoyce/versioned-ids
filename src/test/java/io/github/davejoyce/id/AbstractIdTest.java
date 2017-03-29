@@ -105,4 +105,6 @@ public abstract class AbstractIdTest {
         }
     }
 
+    public abstract void testToNamespaceId() throws Exception;
+
 }

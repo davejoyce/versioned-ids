@@ -76,6 +76,17 @@ public class TemporalNamespaceIdTest extends AbstractIdTest {
         assertEquals(actual, expected);
     }
 
+    @Test
+    @Override
+    public void testToNamespaceId() throws Exception {
+        final Instant asOfTime = Instant.now();
+        TemporalNamespaceId<String> tnsId = new TemporalNamespaceId<>("namespace", "id", asOfTime);
+        NamespaceId<String> actual = tnsId.toNamespaceId();
+        NamespaceId<String> expected = new NamespaceId<>("namespace", "id");
+        assertNotSame(actual, tnsId);
+        assertEquals(actual, expected);
+    }
+
     @DataProvider
     public Object[][] compareToData() {
         final Instant asOfTime = Instant.now();

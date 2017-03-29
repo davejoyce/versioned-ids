@@ -28,7 +28,7 @@ import static org.testng.Assert.*;
 public class NamespaceIdTest {
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodDataIterator",
+          dataProvider = "goodNamespaceIdStringIterator",
           groups = "id")
     public void testFromStringGood(String nsIdString,
                                    NamespaceId<String> expected) throws Exception {
@@ -46,7 +46,7 @@ public class NamespaceIdTest {
     }
 
     @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodDataIterator",
+          dataProvider = "goodNamespaceIdStringIteratorWithType",
           groups = "id")
     public <T extends Comparable<T>> void testFromStringWithTypeGood(String nsIdString,
                                                                      Class<T> idType,

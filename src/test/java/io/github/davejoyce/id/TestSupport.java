@@ -122,30 +122,53 @@ public final class TestSupport {
     }
 
     @DataProvider
-    public static Iterator<Object[]> goodDataIterator(Method m) {
-        return goodDataStream(m).iterator();
+    public static Iterator<Object[]> goodNamespaceIdStringIterator() {
+        return goodDataStream(NamespaceId.class, false).iterator();
     }
 
-    private static Stream<Object[]> goodDataStream(Method m) {
-        List<Class<?>> methodParamTypes = Arrays.asList(m.getParameterTypes());
-        boolean withType = m.getName().contains("WithType");
-        if (methodParamTypes.contains(NamespaceId.class)) {
+    @DataProvider
+    public static Iterator<Object[]> goodNamespaceIdStringIteratorWithType() {
+        return goodDataStream(NamespaceId.class, true).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodTemporalNamespaceIdStringIterator() {
+        return goodDataStream(TemporalNamespaceId.class, false).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodTemporalNamespaceIdStringIteratorWithType() {
+        return goodDataStream(TemporalNamespaceId.class, true).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodBiTemporalNamespaceIdStringIterator() {
+        return goodDataStream(BiTemporalNamespaceId.class, false).iterator();
+    }
+
+    @DataProvider
+    public static Iterator<Object[]> goodBiTemporalNamespaceIdStringIteratorWithType() {
+        return goodDataStream(BiTemporalNamespaceId.class, true).iterator();
+    }
+
+    private static Stream<Object[]> goodDataStream(Class<? extends NamespaceId> testTargetClass, boolean withType) {
+        if (NamespaceId.class.equals(testTargetClass)) {
             int count = GOOD_NSID_STRINGS.size();
             return (withType)
                     ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_NSID_TYPED_OBJS.get(i) })
                     : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_NSID_STRING_OBJS.get(i) });
-        } else if (methodParamTypes.contains(TemporalNamespaceId.class)) {
+        } else if (TemporalNamespaceId.class.equals(testTargetClass)) {
             int count = GOOD_TNSID_STRINGS.size();
             return (withType)
                     ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_TNSID_TYPED_OBJS.get(i) })
                     : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_TNSID_STRINGS.get(i), GOOD_TNSID_STRING_OBJS.get(i) });
-        } else if (methodParamTypes.contains(BiTemporalNamespaceId.class)) {
+        } else if (BiTemporalNamespaceId.class.equals(testTargetClass)) {
             int count = GOOD_BTNSID_STRINGS.size();
             return (withType)
                     ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_BTNSID_TYPED_OBJS.get(i) })
                     : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_BTNSID_STRINGS.get(i), GOOD_BTNSID_STRING_OBJS.get(i) });
         } else {
-            throw new IllegalArgumentException("Unsupported test method: " + m.toString());
+            throw new IllegalArgumentException("Unsupported target type: " + testTargetClass);
         }
     }
 

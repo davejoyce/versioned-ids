@@ -25,7 +25,7 @@ import static io.github.davejoyce.util.Arguments.requireNonEmpty;
 import static io.github.davejoyce.util.Arguments.requireNonNull;
 
 /**
- * Subclass of {@link NamespaceId} that holds a high-precision creation
+ * Subclass of {@link NamespaceId} that holds a high-precision effective
  * timestamp. Instances of this class are {@link Comparable} and provide
  * 'natural' sort order. Additionally, a {@code TemporalNamespaceId} object
  * produces a text representation of itself from which it can later be
@@ -103,6 +103,22 @@ public class TemporalNamespaceId<T extends Comparable<T>> extends NamespaceId<T>
         comp = Long.valueOf(this.asOfTime[0]).compareTo(that.asOfTime[0]);
         if (0 != comp) return comp;
         return Long.valueOf(this.asOfTime[1]).compareTo(that.asOfTime[1]);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public NamespaceId<T> toNamespaceId() {
+        return new NamespaceId<>(getNamespace(), getId());
+    }
+
+    /**
+     * Get {@code TemporalNamespaceId} representation of this object.
+     *
+     * @return TemporalNamespaceId representation
+     */
+    public TemporalNamespaceId<T> toTemporalNamespaceId() {
+        return this;
     }
 
     @Override

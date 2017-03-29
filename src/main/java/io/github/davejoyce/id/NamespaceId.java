@@ -16,6 +16,8 @@
 
 package io.github.davejoyce.id;
 
+import io.github.davejoyce.versioned.Versioned;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -32,7 +34,7 @@ import static io.github.davejoyce.util.Arguments.requireNonNull;
  * @param <T> comparable type of ID attribute
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
-public class NamespaceId<T extends Comparable<T>> implements Comparable<NamespaceId<T>> {
+public class NamespaceId<T extends Comparable<T>> implements Versioned<NamespaceId<T>> {
 
     public static final char SEPARATOR = '/';
 
@@ -175,6 +177,16 @@ public class NamespaceId<T extends Comparable<T>> implements Comparable<Namespac
             return comp;
         }
         return this.id.compareTo(o.id);
+    }
+
+    @Override
+    public boolean after(NamespaceId<T> o) {
+        return (0 < this.compareTo(o));
+    }
+
+    @Override
+    public boolean before(NamespaceId<T> o) {
+        return (0 > this.compareTo(o));
     }
 
     /**

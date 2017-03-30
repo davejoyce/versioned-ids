@@ -16,7 +16,13 @@
 
 package io.github.davejoyce.id;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import static org.testng.Assert.*;
 
@@ -25,113 +31,116 @@ import static org.testng.Assert.*;
  *
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
-public class NamespaceIdTest {
+public class NamespaceIdTest extends AbstractIdTest {
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodNamespaceIdStringIterator",
-          groups = "id")
-    public void testFromStringGood(String nsIdString,
-                                   NamespaceId<String> expected) throws Exception {
-        NamespaceId<String> actual = NamespaceId.fromString(nsIdString);
-        assertEquals(actual, expected);
+    private static final List<String> GOOD_NSID_STRINGS = new ArrayList<>();
+    private static final List<String> BAD_NSID_STRINGS = new ArrayList<>();
+    private static final List<NamespaceId<String>> GOOD_NSID_STRING_OBJS = new ArrayList<>();
+    private static final List<NamespaceId<?>> GOOD_NSID_TYPED_OBJS = new ArrayList<>();
+
+    static {
+        GOOD_NSID_STRINGS.add("namespace/id");
+        GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "id"));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<String>("namespace", "id"));
+        GOOD_NSID_STRINGS.add("namespace/2");
+        GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "2"));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<Integer>("namespace", 2));
+        GOOD_NSID_STRINGS.add("namespace/3.141592");
+        GOOD_NSID_STRING_OBJS.add(new NamespaceId<>("namespace", "3.141592"));
+        GOOD_NSID_TYPED_OBJS.add(new NamespaceId<Float>("namespace", 3.141592F));
+        BAD_NSID_STRINGS.add(null);
+        BAD_NSID_STRINGS.add("");
+        BAD_NSID_STRINGS.add("/noNamespace");
+        BAD_NSID_STRINGS.add("noId/");
     }
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "badDataIterator",
-          groups = "id",
-          expectedExceptions = IllegalArgumentException.class)
-    public void testFromStringBad(String nsIdString) throws Exception {
-        NamespaceId.fromString(nsIdString);
-        fail("Expected exception on parse of: " + nsIdString);
+    @Test
+    @Override
+    public void testToNamespaceId() throws Exception {
+        NamespaceId<String> expected = new NamespaceId<>("namespace", "id");
+        NamespaceId<String> actual = expected.toNamespaceId();
+        assertSame(actual, expected);
     }
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodNamespaceIdStringIteratorWithType",
-          groups = "id")
-    public <T extends Comparable<T>> void testFromStringWithTypeGood(String nsIdString,
-                                                                     Class<T> idType,
-                                                                     NamespaceId<T> expected) throws Exception {
-        NamespaceId<T> actual = NamespaceId.fromString(nsIdString, idType);
-        assertEquals(actual, expected);
+    @DataProvider
+    public Object[][] compareToData() {
+        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
+        return new Object[][] {
+                new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 2), BEFORE},
+                new Object[]{new NamespaceId<Integer>("apples", 1), new NamespaceId<Integer>("bananas", 1), BEFORE},
+                new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 1), AFTER},
+                new Object[]{new NamespaceId<Integer>("bananas", 1), new NamespaceId<Integer>("apples", 1), AFTER},
+                new Object[]{new NamespaceId<Integer>("namespace", 2), new NamespaceId<Integer>("namespace", 2), EQUAL},
+                new Object[]{nsId, nsId, EQUAL},
+        };
     }
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "badDataIterator",
-          groups = "id",
-          expectedExceptions = IllegalArgumentException.class)
-    public <T extends Comparable<T>> void testFromStringWithTypeBad(String nsIdString,
-                                                                    Class<T> idType) throws Exception {
-        NamespaceId.fromString(nsIdString, idType);
-        fail("Expected exception on parse of: " + nsIdString);
+    @DataProvider
+    public Object[][] equalityData() {
+        final NamespaceId<Integer> nsId = new NamespaceId<>("identity", 10);
+        return new Object[][] {
+                new Object[]{new NamespaceId<Integer>("namespace", 1), new NamespaceId<Integer>("namespace", 1), true},
+                new Object[]{new NamespaceId<Float>("namespace", 3.141592F), new NamespaceId<Float>("namespace", 3.141592F), true},
+                new Object[]{new NamespaceId<String>("namespace", "id"), new NamespaceId<String>("namespace", "ID"), false},
+                new Object[]{new NamespaceId<Integer>("namespace", 1), null, false},
+                new Object[]{nsId, nsId, true},
+        };
     }
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodGetterDataIterator",
-          groups = "id")
-    public void testGetNamespace(NamespaceId<?> nsId) throws Exception {
-        assertNotNull(nsId.getNamespace());
+    @DataProvider
+    public Iterator<Object[]> toStringData() {
+        int count = GOOD_NSID_STRING_OBJS.size();
+        return IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRING_OBJS.get(i), GOOD_NSID_STRINGS.get(i) }).iterator();
     }
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodGetterDataIterator",
-          groups = "id")
-    public void testGetId(NamespaceId<?> nsId) throws Exception {
-        assertNotNull(nsId.getId());
+    @DataProvider
+    public Iterator<Object[]> badFromStringData() {
+        return fromStringStreamIterator(false, false);
     }
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testEquals(NamespaceId<T> nsId1,
-                                                     NamespaceId<T> nsId2,
-                                                     boolean expectedEqual) throws Exception {
-        boolean actual1 = nsId1.equals(nsId2);
-        boolean actual2 = (null != nsId2) && nsId2.equals(nsId1);
-        assertEquals(actual1, actual2);
-        assertEquals(actual1, expectedEqual);
+    @DataProvider
+    public Iterator<Object[]> badFromStringWithTypeData() {
+        return fromStringStreamIterator(false, true);
     }
 
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "equalityDataArray",
-          groups = "id")
-    public void testHashCode(NamespaceId<?> nsId1, NamespaceId<?> nsId2, boolean expectedEqual) throws Exception {
-        int actual1 = nsId1.hashCode();
-        int actual2 = (null != nsId2) ? nsId2.hashCode() : -1;
-        if (expectedEqual) {
-            assertEquals(actual1, actual2);
+    @DataProvider
+    public Iterator<Object[]> goodFromStringData() {
+        return fromStringStreamIterator(true, false);
+    }
+
+    @DataProvider
+    public Iterator<Object[]> goodFromStringWithTypeData() {
+        return fromStringStreamIterator(true, true);
+    }
+
+    @DataProvider
+    public Iterator<Object[]> goodGetterData() {
+        return GOOD_NSID_TYPED_OBJS.stream().map(nsId -> new Object[]{ nsId }).iterator();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected <T extends Comparable<T>, R extends NamespaceId<T>> R fromStringWithType(String nsIdString, Class<T> idType) {
+        return (R)NamespaceId.fromString(nsIdString, idType);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    protected <R extends NamespaceId<String>> R fromString(String nsIdString) {
+        return (R)NamespaceId.fromString(nsIdString);
+    }
+
+    private Iterator<Object[]> fromStringStreamIterator(boolean goodData, boolean withType) {
+        if (goodData) {
+            int count = GOOD_NSID_STRINGS.size();
+            return (withType)
+                    ? IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_ID_TYPES.get(i), GOOD_NSID_TYPED_OBJS.get(i) }).iterator()
+                    : IntStream.range(0, count).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), GOOD_NSID_STRING_OBJS.get(i) }).iterator();
         } else {
-            assertNotEquals(actual1, actual2);
+            return (withType)
+                    ? IntStream.range(0, GOOD_NSID_STRINGS.size()).mapToObj(i -> new Object[]{ GOOD_NSID_STRINGS.get(i), BAD_ID_TYPES.get(i) }).iterator()
+                    : BAD_NSID_STRINGS.stream().map(bad_nsid_string -> new Object[]{bad_nsid_string}).iterator();
         }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "compareToDataArray",
-          groups = "id")
-    public <T extends Comparable<T>> void testCompareTo(NamespaceId<T> nsId1,
-                                                        NamespaceId<T> nsId2,
-                                                        int expectedResultFlag) throws Exception {
-        int actual = nsId1.compareTo(nsId2);
-        switch (expectedResultFlag) {
-            case TestSupport.BEFORE:
-                assertTrue(0 > actual);
-                break;
-            case TestSupport.EQUAL:
-                assertTrue(0 == actual);
-                break;
-            case TestSupport.AFTER:
-                assertTrue(0 < actual);
-                break;
-            default:
-                break;
-        }
-    }
-
-    @Test(dataProviderClass = TestSupport.class,
-          dataProvider = "goodToStringDataIterator",
-          groups = "id")
-    public void testToString(NamespaceId<?> nsId, String expected) throws Exception {
-        String actual = nsId.toString();
-        assertEquals(actual, expected);
     }
 
 }

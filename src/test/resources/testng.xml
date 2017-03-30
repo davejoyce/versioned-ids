@@ -25,7 +25,7 @@
         </groups>
         <packages>
             <package name="io.github.davejoyce.util" />
-            <package name="io.github.davejoyce.io" />
+            <package name="io.github.davejoyce.id" />
         </packages>
     </test> <!-- Command line test -->
 </suite> <!-- Command line suite -->

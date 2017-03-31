@@ -20,7 +20,7 @@ package io.github.davejoyce.versioned;
  * Core behavior of objects which are versioned; that is, objects which possess
  * a distinct version value for each incremental change in their total state.
  *
- * <T> comparable version type
+ * @param <T> comparable version type
  * @author <a href="mailto:dave@osframework.org">Dave Joyce</a>
  */
 public interface Versioned<T> extends Comparable<T> {

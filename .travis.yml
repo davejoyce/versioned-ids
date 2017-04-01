@@ -14,11 +14,13 @@ env:
 
 install: mvn install -P !build-extras -DskipTests=true -Dmaven.javadoc.skip=true -B -V
 script: mvn test -P !build-extras -B
+script: mvn cobertura:cobertura -P !build-extras -B
 
 cache:
   directories:
     - ~/.m2/repository
 
 after_success:
+  - bash <(curl -s https://codecov.io/bash)
   - ./cd/before-deploy.sh
   - ./cd/deploy.sh

@@ -21,6 +21,20 @@
         </license>
     </licenses>
 
+    <organization>
+        <name>David Joyce</name>
+        <url>http://davejoyce.github.io/</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>davejoyce</id>
+            <name>Dave Joyce</name>
+            <email>dave@osframework.org</email>
+            <url>https://github.com/davejoyce/</url>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:https://github.com/davejoyce/versioned-ids.git</connection>
         <developerConnection>scm:git:git@github.com:davejoyce/versioned-ids.git</developerConnection>
@@ -31,15 +45,6 @@
         <system>GitHub Issues</system>
         <url>https://github.com/davejoyce/versioned-ids/issues</url>
     </issueManagement>
-
-    <developers>
-        <developer>
-            <id>davejoyce</id>
-            <name>Dave Joyce</name>
-            <email>dave@osframework.org</email>
-            <url>https://github.com/davejoyce/</url>
-        </developer>
-    </developers>
 
     <distributionManagement>
         <snapshotRepository>

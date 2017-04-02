@@ -55,15 +55,78 @@ public class TemporalNamespaceIdTest extends AbstractIdTest {
         BAD_TNSID_STRINGS.add("temporal/2/1977-11-13");
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromStringNoSeparator() throws Exception {
+        String badTnsIdString = "temporal.id.1977-11-13T14:18:00Z";
+        TemporalNamespaceId<String> tnsId = TemporalNamespaceId.fromString(badTnsIdString);
+        fail("Expected IllegalArgumentException on 0 separators");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromStringOneSeparator() throws Exception {
+        String badTnsIdString = "namespace/id";
+        TemporalNamespaceId<String> tnsId = TemporalNamespaceId.fromString(badTnsIdString);
+        fail("Expected IllegalArgumentException on less than 2 separators");
+    }
+
+    @Test
+    public void testConstructorEpochSeconds() {
+        Instant timestamp = Instant.parse("1977-11-13T14:18:00Z");
+        TemporalNamespaceId<Integer> tnsId = new TemporalNamespaceId<Integer>("temporal", 1, timestamp.getEpochSecond());
+        Instant asOfTime = tnsId.getAsOfTime();
+        assertEquals(asOfTime, timestamp);
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+        TemporalNamespaceId<Integer> tnsId = TemporalNamespaceId.fromString("temporal/1/1977-11-13T14:18:00Z", Integer.class);
+        boolean actual = tnsId.equals(null);
+        assertFalse(actual);
+
+        Instant notAnNsId = Instant.now();
+        actual = tnsId.equals(notAnNsId);
+        assertFalse(actual);
+
+        TemporalNamespaceId<Integer> tnsId2 = TemporalNamespaceId.fromString("temporal/1/1977-11-13T14:18:00Z", Integer.class);
+        assertTrue(tnsId2.equals(tnsId));
+        assertTrue(tnsId.equals(tnsId2));
+    }
+
+    @Test
+    public void testCompareTo() throws Exception {
+        TemporalNamespaceId<Integer> tnsId1 = TemporalNamespaceId.fromString("temporal/1/1977-11-13T14:18:00Z", Integer.class);
+        TemporalNamespaceId<Integer> tnsId2 = TemporalNamespaceId.fromString("temporal/2/1977-11-13T14:18:00Z", Integer.class);
+        int actual = tnsId1.compareTo(tnsId2);
+        assertTrue(0 > actual);
+
+        actual = tnsId2.compareTo(tnsId1);
+        assertTrue(0 < actual);
+    }
+
     @Test
     @Override
     public void testToNamespaceId() throws Exception {
         final Instant asOfTime = Instant.now();
-        TemporalNamespaceId<String> tnsId = new TemporalNamespaceId<>("namespace", "id", asOfTime);
+        TemporalNamespaceId<String> tnsId = new TemporalNamespaceId<>("temporal", "id", asOfTime);
         NamespaceId<String> actual = tnsId.toNamespaceId();
-        NamespaceId<String> expected = new NamespaceId<>("namespace", "id");
+        NamespaceId<String> expected = new NamespaceId<>("temporal", "id");
         assertNotSame(actual, tnsId);
         assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testToTemporalNamespaceId() throws Exception {
+        TemporalNamespaceId<Integer> tnsId1 = TemporalNamespaceId.fromString("temporal/1/1977-11-13T14:18:00Z", Integer.class);
+        TemporalNamespaceId<Integer> tnsId2 = tnsId1.toTemporalNamespaceId();
+        assertEquals(tnsId2, tnsId1);
+        assertSame(tnsId2, tnsId1);
+    }
+
+    @Test
+    public void testCastToNamespaceId() throws Exception {
+        TemporalNamespaceId<Integer> tnsId = TemporalNamespaceId.fromString("temporal/1/1977-11-13T14:18:00Z", Integer.class);
+        NamespaceId<Integer> nsId = tnsId;
+        assertEquals(nsId, tnsId);
     }
 
     @DataProvider

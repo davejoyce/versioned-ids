@@ -56,6 +56,60 @@ public class BiTemporalNamespaceIdTest extends AbstractIdTest {
         BAD_BTNSID_STRINGS.add("bitemporal/2/1977-11-13T14:18:00Z/2008-01-05");
     }
 
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromStringNoSeparator() throws Exception {
+        String badTnsIdString = "bitemporal.id.1977-11-13T14:18:00Z.2008-01-05T22:00:00Z";
+        BiTemporalNamespaceId<String> tnsId = BiTemporalNamespaceId.fromString(badTnsIdString);
+        fail("Expected IllegalArgumentException on 0 separators");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromStringTwoSeparators() throws Exception {
+        String badTnsIdString = "bitemporal/id/1977-11-13T14:18:00Z";
+        BiTemporalNamespaceId<String> tnsId = BiTemporalNamespaceId.fromString(badTnsIdString);
+        fail("Expected IllegalArgumentException on less than 3 separators");
+    }
+
+    @Test
+    public void testConstructorEpochSeconds() {
+        Instant timestamp1 = Instant.parse("1977-11-13T14:18:00Z");
+        Instant timestamp2 = Instant.parse("2008-01-05T22:00:00Z");
+        BiTemporalNamespaceId<Integer> tnsId = new BiTemporalNamespaceId<Integer>("bitemporal",
+                1,
+                timestamp1.getEpochSecond(),
+                timestamp2.getEpochSecond());
+        Instant asOfTime = tnsId.getAsOfTime();
+        Instant asAtTime = tnsId.getAsAtTime();
+        assertEquals(asOfTime, timestamp1);
+        assertEquals(asAtTime, timestamp2);
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+        BiTemporalNamespaceId<Integer> tnsId = BiTemporalNamespaceId.fromString("bitemporal/1/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z", Integer.class);
+        boolean actual = tnsId.equals(null);
+        assertFalse(actual);
+
+        Instant notAnNsId = Instant.now();
+        actual = tnsId.equals(notAnNsId);
+        assertFalse(actual);
+
+        BiTemporalNamespaceId<Integer> tnsId2 = BiTemporalNamespaceId.fromString("bitemporal/1/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z", Integer.class);
+        assertTrue(tnsId2.equals(tnsId));
+        assertTrue(tnsId.equals(tnsId2));
+    }
+
+    @Test
+    public void testCompareTo() throws Exception {
+        BiTemporalNamespaceId<Integer> tnsId1 = BiTemporalNamespaceId.fromString("bitemporal/1/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z", Integer.class);
+        BiTemporalNamespaceId<Integer> tnsId2 = BiTemporalNamespaceId.fromString("bitemporal/1/1977-11-13T14:18:01Z/2008-01-05T22:00:00Z", Integer.class);
+        int actual = tnsId1.compareTo(tnsId2);
+        assertTrue(0 > actual);
+
+        actual = tnsId2.compareTo(tnsId1);
+        assertTrue(0 < actual);
+    }
+
     @Test
     @Override
     public void testToNamespaceId() throws Exception {
@@ -66,6 +120,24 @@ public class BiTemporalNamespaceIdTest extends AbstractIdTest {
         NamespaceId<String> expected = new NamespaceId<>("namespace", "id");
         assertNotSame(actual, btnsId);
         assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testToTemporalNamespaceId() throws Exception {
+        BiTemporalNamespaceId<Integer> tnsId1 = BiTemporalNamespaceId.fromString("bitemporal/1/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z", Integer.class);
+        TemporalNamespaceId<Integer> tnsId2 = tnsId1.toTemporalNamespaceId();
+        assertEquals(tnsId2.getAsOfTime(), tnsId1.getAsOfTime());
+        assertEquals(tnsId2.getId(), tnsId1.getId());
+        assertEquals(tnsId2.getNamespace(), tnsId1.getNamespace());
+        assertNotSame(tnsId2, tnsId1);
+    }
+
+    @Test
+    public void testToBiTemporalNamespaceId() throws Exception {
+        BiTemporalNamespaceId<Integer> tnsId1 = BiTemporalNamespaceId.fromString("bitemporal/1/1977-11-13T14:18:00Z/2008-01-05T22:00:00Z", Integer.class);
+        BiTemporalNamespaceId<Integer> tnsId2 = tnsId1.toBiTemporalNamespaceId();
+        assertEquals(tnsId2, tnsId1);
+        assertSame(tnsId2, tnsId1);
     }
 
     @DataProvider

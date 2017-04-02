@@ -159,7 +159,8 @@ public class NamespaceId<T extends Comparable<T>> implements Versioned<Namespace
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         NamespaceId<?> that = (NamespaceId<?>) o;
-        return (this.namespace.equals(that.namespace) && this.id.equals(that.id));
+        return ((null == namespace ? null == that.namespace : namespace.equals(that.namespace)) &&
+                (null == id ? null == that.id : id.equals(that.id)));
     }
 
     @Override

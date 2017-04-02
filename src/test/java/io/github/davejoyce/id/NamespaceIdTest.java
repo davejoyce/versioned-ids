@@ -80,9 +80,17 @@ public class NamespaceIdTest extends AbstractIdTest {
         actual = nsId.equals(notAnNsId);
         assertFalse(actual);
 
-        NamespaceId<Integer> nsId2 = NamespaceId.fromString("namespace/1", Integer.class);
-        assertTrue(nsId2.equals(nsId));
-        assertTrue(nsId.equals(nsId2));
+        NamespaceId<Integer> nsId2 = NamespaceId.fromString("otherNamespace/1", Integer.class);
+        actual = nsId.equals(nsId2);
+        assertFalse(actual);
+
+        NamespaceId<Integer> nsId3 = NamespaceId.fromString("namespace/2", Integer.class);
+        actual = nsId.equals(nsId3);
+        assertFalse(actual);
+
+        NamespaceId<Integer> nsId4 = NamespaceId.fromString("namespace/1", Integer.class);
+        assertTrue(nsId4.equals(nsId));
+        assertTrue(nsId.equals(nsId4));
     }
 
     @Test

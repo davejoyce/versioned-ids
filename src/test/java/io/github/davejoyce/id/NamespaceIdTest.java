@@ -19,6 +19,7 @@ package io.github.davejoyce.id;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -52,6 +53,44 @@ public class NamespaceIdTest extends AbstractIdTest {
         BAD_NSID_STRINGS.add("");
         BAD_NSID_STRINGS.add("/noNamespace");
         BAD_NSID_STRINGS.add("noId/");
+    }
+
+    @Test(expectedExceptions = IllegalArgumentException.class)
+    public void testFromStringNoSeparator() throws Exception {
+        String badNsIdString = "namespace.1";
+        NamespaceId<Integer> nsId = NamespaceId.fromString(badNsIdString, Integer.class);
+        fail("Expected IllegalArgumentException on missing separator '/'");
+    }
+
+    @Test
+    public void testFromStringIgnoresAdditionalSegments() throws Exception {
+        NamespaceId<Integer> expected = new NamespaceId<>("namespace", 1);
+        String nsIdWithExtraSegmentString = "namespace/1/1977-11-13T14:18:00Z";
+        NamespaceId<Integer> actual = NamespaceId.fromString(nsIdWithExtraSegmentString, Integer.class);
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+        NamespaceId<Integer> nsId = NamespaceId.fromString("namespace/1", Integer.class);
+        boolean actual = nsId.equals(null);
+        assertFalse(actual);
+
+        Instant notAnNsId = Instant.now();
+        actual = nsId.equals(notAnNsId);
+        assertFalse(actual);
+
+        NamespaceId<Integer> nsId2 = NamespaceId.fromString("otherNamespace/1", Integer.class);
+        actual = nsId.equals(nsId2);
+        assertFalse(actual);
+
+        NamespaceId<Integer> nsId3 = NamespaceId.fromString("namespace/2", Integer.class);
+        actual = nsId.equals(nsId3);
+        assertFalse(actual);
+
+        NamespaceId<Integer> nsId4 = NamespaceId.fromString("namespace/1", Integer.class);
+        assertTrue(nsId4.equals(nsId));
+        assertTrue(nsId.equals(nsId4));
     }
 
     @Test

@@ -195,7 +195,8 @@ public class NamespaceId<T extends Comparable<T>>
             return false;
         }
         NamespaceId<?> that = (NamespaceId<?>) o;
-        return (namespace.equals(that.namespace) && id.equals(that.id));
+        return ((null == namespace ? null == that.namespace : namespace.equals(that.namespace)) &&
+                (null == id ? null == that.id : id.equals(that.id)));
     }
 
     @Override

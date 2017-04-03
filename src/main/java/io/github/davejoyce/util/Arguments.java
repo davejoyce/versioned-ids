@@ -23,30 +23,86 @@ package io.github.davejoyce.util;
  */
 public final class Arguments {
 
+    /**
+     * Default message of IllegalArgumentException thrown due to null argument.
+     */
     public static final String ERROR_NULL_ARG = "Argument cannot be null";
-    public static final String ERROR_EMPTY_STRING = "String argument cannot be empty";
 
-    private Arguments() {}
+    /**
+     * Default message of IllegalArgumentException thrown due to empty String
+     * argument.
+     */
+    public static final String ERROR_EMPTY_STRING = "Argument cannot be empty";
 
-    public static <T> T requireNonNull(T argument, String errMsg) {
+    /**
+     * Private constructor to prevent instantiation of this class.
+     */
+    private Arguments() {
+        throw new AssertionError("Argument instances not allowed");
+    }
+
+    /**
+     * Ensure non-null parameter requirement of the caller. If the specified
+     * argument is null, an {@code IllegalArgumentException} with the given
+     * message is thrown.
+     *
+     * @param argument method argument to be checked
+     * @param errMsg error message of exception to be thrown if
+     *               <tt>argument</tt> is null
+     * @param <T> type or argument to be checked
+     * @return specified <tt>argument</tt>
+     * @throws IllegalArgumentException if <tt>argument</tt> is null
+     */
+    public static <T> T requireNonNull(final T argument, final String errMsg) {
         if (null == argument) {
             throw new IllegalArgumentException(errMsg);
         }
         return argument;
     }
 
-    public static <T> T requireNonNull(T argument) {
+    /**
+     * Ensure non-null parameter requirement of the caller. If the specified
+     * argument is null, an {@code IllegalArgumentException} with the
+     * {@link #ERROR_NULL_ARG default} message is thrown.
+     *
+     * @param argument method argument to be checked
+     * @param <T> type or argument to be checked
+     * @return specified <tt>argument</tt>
+     * @throws IllegalArgumentException if <tt>argument</tt> is null
+     */
+    public static <T> T requireNonNull(final T argument) {
         return requireNonNull(argument, ERROR_NULL_ARG);
     }
 
-    public static String requireNonEmpty(String argument, String errMsg) {
+    /**
+     * Ensure non-empty parameter requirement of the caller. If the specified
+     * argument is empty, an {@code IllegalArgumentException} with the given
+     * message is thrown.
+     *
+     * @param argument method argument to be checked
+     * @param errMsg error message of exception to be thrown if
+     *               <tt>argument</tt> is empty
+     * @return specified <tt>argument</tt>
+     * @throws IllegalArgumentException if <tt>argument</tt> is empty
+     */
+    public static String requireNonEmpty(final String argument,
+                                         final String errMsg) {
         if (null == argument || "".equals(argument.trim())) {
             throw new IllegalArgumentException(errMsg);
         }
         return argument;
     }
 
-    public static String requireNonEmpty(String argument) {
+    /**
+     * Ensure non-empty parameter requirement of the caller. If the specified
+     * argument is empty, an {@code IllegalArgumentException} with the
+     * {@link #ERROR_EMPTY_STRING default} message is thrown.
+     *
+     * @param argument method argument to be checked
+     * @return specified <tt>argument</tt>
+     * @throws IllegalArgumentException if <tt>argument</tt> is empty
+     */
+    public static String requireNonEmpty(final String argument) {
         return requireNonEmpty(argument, ERROR_EMPTY_STRING);
     }
 

@@ -19,9 +19,9 @@ dependency:
 
 ```xml
 <dependency>
-    <groupId>io.github.davejoyce</groupId>
-    <artifactId>versioned-ids</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>${project.groupId}</groupId>
+    <artifactId>${project.artifactId}</artifactId>
+    <version>${project.version}</version>
 </dependency>
 ```
 
@@ -30,8 +30,8 @@ dependency:
 | You need: | Choose:  |
 | -------- | -------- |
 | categorical organization of IDs | [NamespaceId\<T\>](examples.html#Using_NamespaceId) |
-| ...and storage of creation/effective time | TemporalNamespaceId\<T\> |
-| ...and storage of update/fixing time | BiTemporalNamespaceId\<T\> |
+| ...and storage of creation/effective time | [TemporalNamespaceId\<T\>](examples.html#Using_TemporalNamespaceId) |
+| ...and storage of update/fixing time | [BiTemporalNamespaceId\<T\>](examples.html#Using_BiTemporalNamespaceId) |
 
 3. Finally, does the type you selected store enough information, or do you need a bit more richness? All of these types
 support extension and composition!

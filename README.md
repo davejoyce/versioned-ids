@@ -29,7 +29,7 @@ dependency:
 </dependency>
 ```
 
-2. Next, choose one of the 3 basic ID types depending upon the level of time-sensitivity in your domain model.
+2. Choose one of the 3 basic ID types depending upon the level of time-sensitivity in your domain model.
 
 | You need: | Choose:  |
 | -------- | -------- |
@@ -37,8 +37,15 @@ dependency:
 | ...and storage of creation/effective time | TemporalNamespaceId\<T\> |
 | ...and storage of update/fixing time | BiTemporalNamespaceId\<T\> |
 
-3. Finally, does the type you selected store enough information, or do you need a bit more richness? All of these types
-support extension and composition!
+3. Does the type you selected store enough information, or do you need a bit more richness? The classes in this library
+   support extension and composition!
+
+## Documentation
+
+Project documentation (including API documentation)
+
+* [Latest Release documentation](https://davejoyce.github.io/versioned-ids/release/)
+* [Current Snapshot documentation](https://davejoyce.github.io/versioned-ids/snapshot/)
 
 ## Bugs and Feedback
 

@@ -21,6 +21,20 @@
         </license>
     </licenses>
 
+    <organization>
+        <name>David Joyce</name>
+        <url>http://davejoyce.github.io/</url>
+    </organization>
+
+    <developers>
+        <developer>
+            <id>davejoyce</id>
+            <name>Dave Joyce</name>
+            <email>dave@osframework.org</email>
+            <url>https://github.com/davejoyce/</url>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:https://github.com/davejoyce/versioned-ids.git</connection>
         <developerConnection>scm:git:git@github.com:davejoyce/versioned-ids.git</developerConnection>
@@ -31,15 +45,6 @@
         <system>GitHub Issues</system>
         <url>https://github.com/davejoyce/versioned-ids/issues</url>
     </issueManagement>
-
-    <developers>
-        <developer>
-            <id>davejoyce</id>
-            <name>Dave Joyce</name>
-            <email>dave@osframework.org</email>
-            <url>https://github.com/davejoyce/</url>
-        </developer>
-    </developers>
 
     <distributionManagement>
         <snapshotRepository>
@@ -52,6 +57,7 @@
         <project.build.javaVersion>1.8</project.build.javaVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputVersion>UTF-8</project.reporting.outputVersion>
+        <site.path>snapshot</site.path>
 
         <!-- Dependency versions -->
         <testng.version>6.11</testng.version>
@@ -62,9 +68,12 @@
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
+        <maven-project-info-reports-plugin.version>2.9</maven-project-info-reports-plugin.version>
         <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
+        <maven-site-plugin.version>3.6</maven-site-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
+        <site-maven-plugin.version>0.12</site-maven-plugin.version>
     </properties>
 
     <dependencies>
@@ -151,8 +160,57 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
+            <!-- Disable default site deploy -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>${maven-site-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>default-deploy</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>deploy</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>${cobertura-maven-plugin.version}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>cobertura</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 
     <profiles>
         <profile>
@@ -190,11 +248,33 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <groupId>com.github.github</groupId>
+                        <artifactId>site-maven-plugin</artifactId>
+                        <version>${site-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>site-deploy</phase>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                                <configuration>
+                                    <server>github-davejoyce</server>
+                                    <message>Building site for ${project.name}</message>
+                                    <path>${site.path}</path>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
         <profile>
             <id>sign</id>
+            <properties>
+                <site.path>release</site.path>
+            </properties>
             <build>
                 <plugins>
                     <plugin>

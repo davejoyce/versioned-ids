@@ -25,5 +25,6 @@ cache:
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - ./cd/before-deploy.sh
-  - ./cd/deploy.sh
+  - bash travis-deploy-sonatype/scripts/deploy.sh 118457b0408e travis/codesigning.asc.enc travis/settings.xml
+  - # ^^ Installs gpg2 for code signing
+sudo: true

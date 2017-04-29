@@ -44,7 +44,7 @@ dependency:
 
 Project documentation (including API documentation)
 
-* [Latest Release documentation](https://davejoyce.github.io/versioned-ids/release/)
+* [Latest Release documentation](https://www.javadoc.io/doc/io.github.davejoyce/versioned-ids/)
 * [Current Snapshot documentation](https://davejoyce.github.io/versioned-ids/snapshot/)
 
 ## Bugs and Feedback

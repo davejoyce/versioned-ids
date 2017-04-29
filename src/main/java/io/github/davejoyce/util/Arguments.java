@@ -38,6 +38,7 @@ public final class Arguments {
      * Private constructor to prevent instantiation of this class.
      */
     private Arguments() {
+        // This causes InvocationTargetException from Reflection API
         throw new AssertionError("Argument instances not allowed");
     }
 

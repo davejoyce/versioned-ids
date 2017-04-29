@@ -1,7 +1,7 @@
 # Versioned IDs
 
-[![Build Status](https://travis-ci.org/davejoyce/versioned-ids.svg?branch=release/1.0)](https://travis-ci.org/davejoyce/versioned-ids)
-[![codecov.io](http://codecov.io/github/davejoyce/versioned-ids/coverage.svg?branch=release/1.0)](https://codecov.io/gh/davejoyce/versioned-ids/branch/release/1.0)
+[![Build Status](https://travis-ci.org/davejoyce/versioned-ids.svg?branch=feature/18)](https://travis-ci.org/davejoyce/versioned-ids)
+[![codecov.io](http://codecov.io/github/davejoyce/versioned-ids/coverage.svg?branch=feature/18)](https://codecov.io/gh/davejoyce/versioned-ids/branch/feature/18)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.davejoyce/versioned-ids/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.davejoyce/versioned-ids/badge.svg)
 
 Versioned IDs are namespace-aware identifier types that support simple value incrementation while storing a high degree
@@ -25,7 +25,7 @@ dependency:
 <dependency>
     <groupId>io.github.davejoyce</groupId>
     <artifactId>versioned-ids</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -44,7 +44,7 @@ dependency:
 
 Project documentation (including API documentation)
 
-* [Latest Release documentation](https://davejoyce.github.io/versioned-ids/release/)
+* [Latest Release documentation](https://www.javadoc.io/doc/io.github.davejoyce/versioned-ids/)
 * [Current Snapshot documentation](https://davejoyce.github.io/versioned-ids/snapshot/)
 
 ## Bugs and Feedback

@@ -1,7 +1,7 @@
 # Versioned IDs
 
-[![Build Status](https://travis-ci.org/davejoyce/versioned-ids.svg?branch=feature/18)](https://travis-ci.org/davejoyce/versioned-ids)
-[![codecov.io](http://codecov.io/github/davejoyce/versioned-ids/coverage.svg?branch=feature/18)](https://codecov.io/gh/davejoyce/versioned-ids/branch/feature/18)
+[![Build Status](https://travis-ci.org/davejoyce/versioned-ids.svg?branch=feature/19)](https://travis-ci.org/davejoyce/versioned-ids)
+[![codecov.io](http://codecov.io/github/davejoyce/versioned-ids/coverage.svg?branch=feature/19)](https://codecov.io/gh/davejoyce/versioned-ids/branch/feature/19)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.davejoyce/versioned-ids/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.davejoyce/versioned-ids/badge.svg)
 
 Versioned IDs are namespace-aware identifier types that support simple value incrementation while storing a high degree

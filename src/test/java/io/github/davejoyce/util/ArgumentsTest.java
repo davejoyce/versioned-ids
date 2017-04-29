@@ -18,6 +18,10 @@ package io.github.davejoyce.util;
 
 import org.testng.annotations.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+
 import static org.testng.Assert.*;
 
 /**
@@ -70,6 +74,25 @@ public class ArgumentsTest {
             fail("Expected IllegalArgumentException");
         } catch (IllegalArgumentException iae) {
             assertEquals(iae.getMessage(), expectedMsg);
+        }
+    }
+
+    @Test(groups = "util")
+    public void testCannotInstantiate() throws Exception {
+        // Use reflection to change visibility of no-arg constructor
+        Constructor<?>[] constructors = Arguments.class.getDeclaredConstructors();
+        assertEquals(constructors.length, 1);
+
+        Constructor<?> c = constructors[0];
+        int actual = (c.getModifiers() & Modifier.PRIVATE);
+        assertEquals(actual, Modifier.PRIVATE);
+
+        c.setAccessible(true);
+        try {
+            Arguments a = (Arguments)c.newInstance();
+            fail("Should not be able to create Arguments instance: " + a);
+        } catch (Throwable t) {
+            assertTrue(InvocationTargetException.class.isInstance(t), ("Throwable was " + t.getClass().getName()));
         }
     }
 

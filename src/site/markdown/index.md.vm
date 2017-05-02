@@ -5,7 +5,7 @@ of information. They offer application developers an easy way to get started bui
 models with strong IDs that are:
 
 * Categorical
-* Human-readble
+* Human-readable
 * Incrementable
 * Immutable
 * Serializable
@@ -33,5 +33,5 @@ dependency:
 | ...and storage of creation/effective time | [TemporalNamespaceId\<T\>](examples.html#Using_TemporalNamespaceId) |
 | ...and storage of update/fixing time | [BiTemporalNamespaceId\<T\>](examples.html#Using_BiTemporalNamespaceId) |
 
-3. Does the type you selected store enough information, or do you need a bit more richness? The classes in this library
+3. Does the type you selected store enough information, or do you need more? The classes in this library
 support extension and composition!

@@ -37,14 +37,14 @@ dependency:
 | ...and storage of creation/effective time | TemporalNamespaceId\<T\> |
 | ...and storage of update/fixing time | BiTemporalNamespaceId\<T\> |
 
-3. Does the type you selected store enough information, or do you need a bit more richness? The classes in this library
+3. Does the type you selected store enough information, or do you need more? The classes in this library
    support extension and composition!
 
 ## Documentation
 
 Project documentation (including API documentation)
 
-* [Latest Release documentation](https://www.javadoc.io/doc/io.github.davejoyce/versioned-ids/)
+* [Latest Release documentation](https://davejoyce.github.io/versioned-ids/release/)
 * [Current Snapshot documentation](https://davejoyce.github.io/versioned-ids/snapshot/)
 
 ## Bugs and Feedback

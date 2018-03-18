@@ -201,6 +201,29 @@
 
     <profiles>
         <profile>
+            <id>release-site-path</id>
+            <activation>
+                <property>
+                    <name>env.TRAVIS_BRANCH</name>
+                    <value>master</value>
+                </property>
+            </activation>
+            <properties>
+                <site.path>release/${project.version}</site.path>
+            </properties>
+        </profile>
+        <profile>
+            <id>snapshot-site-path</id>
+            <activation>
+                <property>
+                    <name>!env.TRAVIS_BRANCH</name>
+                </property>
+            </activation>
+            <properties>
+                <site.path>snapshot</site.path>
+            </properties>
+        </profile>
+        <profile>
             <id>build-extras</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -262,6 +285,8 @@
                                 </goals>
                                 <configuration>
                                     <server>github-davejoyce</server>
+                                    <repositoryOwner>davejoyce</repositoryOwner>
+                                    <repositoryName>versioned-ids</repositoryName>
                                     <message>Building site for ${project.name}</message>
                                     <path>${site.path}</path>
                                 </configuration>

@@ -6,7 +6,7 @@
 
     <groupId>io.github.davejoyce</groupId>
     <artifactId>versioned-ids</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2-SNAPSHOT</version>
 
     <name>Versioned IDs</name>
     <description>Versioned, namespace-aware ID types</description>
@@ -201,29 +201,6 @@
 
     <profiles>
         <profile>
-            <id>release-site-path</id>
-            <activation>
-                <property>
-                    <name>env.TRAVIS_BRANCH</name>
-                    <value>master</value>
-                </property>
-            </activation>
-            <properties>
-                <site.path>release/${project.version}</site.path>
-            </properties>
-        </profile>
-        <profile>
-            <id>snapshot-site-path</id>
-            <activation>
-                <property>
-                    <name>!env.TRAVIS_BRANCH</name>
-                </property>
-            </activation>
-            <properties>
-                <site.path>snapshot</site.path>
-            </properties>
-        </profile>
-        <profile>
             <id>build-extras</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
@@ -272,6 +249,7 @@
                             </execution>
                         </executions>
                     </plugin>
+<!--
                     <plugin>
                         <groupId>com.github.github</groupId>
                         <artifactId>site-maven-plugin</artifactId>
@@ -289,6 +267,29 @@
                                     <repositoryName>versioned-ids</repositoryName>
                                     <message>Building site for ${project.name}</message>
                                     <path>${site.path}</path>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+-->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>${maven-resources-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>default-deploy</id>
+                                <phase>site-deploy</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/docs</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.directory}/site</directory>
+                                        </resource>
+                                    </resources>
                                 </configuration>
                             </execution>
                         </executions>

@@ -34,7 +34,7 @@
 
     <bannerLeft>
         <name>Versioned IDs</name>
-        <src>images/logos/versioned-ids-logo_110x100.png</src>
+        <src>images/logos/versioned-ids-logo_282x60.png</src>
         <href>https://davejoyce.github.io/versioned-ids/${site.path}/</href>
     </bannerLeft>
     <version position="left"/>

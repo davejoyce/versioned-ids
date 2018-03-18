@@ -4,9 +4,9 @@
 [![codecov.io](http://codecov.io/github/davejoyce/versioned-ids/coverage.svg?branch=${git.branch})](https://codecov.io/gh/davejoyce/versioned-ids/branch/${git.branch})
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.davejoyce/versioned-ids/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.davejoyce/versioned-ids/badge.svg)
 
-Versioned IDs are namespace-aware identifier types that support simple value incrementation while storing a high degree
-of information. They offer application developers an easy way to get started building complex, version-sensitive domain
-models with strong IDs that are:
+Versioned IDs are namespace-aware identifiers that support simple value incrementation while storing a high degree
+of information. They offer application developers an easy way to build complex, version-sensitive domain models
+with strong IDs that are:
 
 * Categorical
 * Human-readable
@@ -37,7 +37,7 @@ dependency:
 | ...and storage of creation/effective time | TemporalNamespaceId\<T\> |
 | ...and storage of update/fixing time | BiTemporalNamespaceId\<T\> |
 
-3. Does the type you selected store enough information, or do you need a bit more richness? The classes in this library
+3. Does the type you selected store enough information, or do you need more? The classes in this library
    support extension and composition!
 
 ## Documentation
